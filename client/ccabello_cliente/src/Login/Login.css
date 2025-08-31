@@ -1,0 +1,146 @@
+@import url('https://fonts.googleapis.com/css?family=Josefin+Sans');
+
+body, html, #root {
+  margin: 0;
+  height: 100%;
+  width: 100%;
+  background-color: #e9eef2;
+}
+
+.layout {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  margin-top: 0;
+
+}
+
+.horizontal_layout {
+  width: 100%;
+  height: 90%;
+  display: flex;
+  margin-top: 0;
+  margin-bottom: 0;
+  flex-direction: row;
+  justify-content: center;
+}
+
+.login {
+  display: flex;
+  flex-direction: column;
+  gap: 0px;
+  width: 70%;
+  height: 90%; /* Ensure it takes full height */
+}
+
+.ellipse {
+  height: 105%;
+  width: 80%;
+  max-height: 105%;
+  max-width: 100%;
+  width: auto;
+  margin-bottom: 0;
+}
+
+.tienda{  
+  height:103%;
+  position: absolute;
+  margin-top: 6%;
+  z-index: 2;
+  position: absolute;
+  top: 0;
+  left: 0;
+  border-image-width:0;
+}
+
+.logo {
+  height: 32%;
+  margin-top: 7%;
+}
+
+.input{
+  margin-left: 20%;
+  background-color: white;
+  border-radius: 30px;
+  border-bottom: 1px solid #9B1313;
+  border-bottom-width: 5px;
+  border-color: #9B1313;
+  color: black;
+  width: 60%;
+  height: 10%;
+  font-size: 200%;
+  text-align: center;
+}
+
+.label{
+  color: black;
+  font-size: 180%;
+  margin-left: 20%;
+  margin-bottom: 0;
+  font-family: 'Josefin Sans', sans-serif;
+  font-weight: 300;
+}
+
+.button{
+  background-color: #9B1313;
+  border-radius: 50px;
+  color: white;
+  width: 25%;
+  font-size: 150%;
+  margin-left: 38%;
+  margin-top: 5%;
+  font-family: 'Josefin Sans', sans-serif;
+  font-weight: 700;
+  margin-bottom: 0;
+  text-overflow:ellipsis;
+}
+
+.button:hover{
+  border-color: white;
+  background-color: #9b1313ec;
+  color:white;
+}
+
+.rectangle{
+  background-color: #9B1313;
+  height: 55%;
+  width: 100%;
+  margin-top: 0;
+}
+
+.tienda_logo{
+  position: relative;
+  margin-left: 0;
+  position: left;
+  max-width: 60%;
+}
+
+error {
+  display: none;
+  opacity: 0;
+  translate: 0 -15vh;
+  transition-property: display, opacity, translate;
+  transition-duration: 0.5s;
+  transition-behavior: allow-discrete; /* Enables `display` transition */
+  margin-top: 2%;
+  margin-bottom: 0;
+}
+
+error[open] {
+  display: block;
+  opacity: 1;
+  translate: 0 0;
+
+  @starting-style {
+    opacity: 0;
+    translate: 0 -15vh;
+  }
+}
+
+
+p{
+  margin-top: 2%;
+  margin-bottom: 0;
+}
+

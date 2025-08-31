@@ -1,0 +1,30 @@
+{
+  "name": "backend",
+  "version": "1.0.0",
+  "main": "server.js",
+  "type": "module",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "nodemon server.js"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "description": "",
+  "dependencies": {
+    "bcrypt": "^5.1.1",
+    "cookie-parser": "^1.4.7",
+    "cors": "^2.8.5",
+    "express": "^4.21.2",
+    "install": "^0.13.0",
+    "jsonwebtoken": "^9.0.2",
+    "mysql": "^2.18.1",
+    "mysql2": "^3.12.0",
+    "node": "^22.14.0",
+    "node-gyp": "^11.1.0",
+    "node-pre-gyp": "^0.17.0",
+    "nodemon": "^3.1.9",
+    "pdfkit": "^0.16.0",
+    "pdfmake": "^0.2.18"
+  }
+}

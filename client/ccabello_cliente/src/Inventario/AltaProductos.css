@@ -1,0 +1,15 @@
+#altaProductos{
+    height: 3vw;
+}
+
+
+#altaProductos:hover{
+    opacity: 0.5;
+    height: 3.1vw;
+    transition: 0.1s ease-in-out;
+}
+
+#label{
+    margin-left:2%;
+}
+

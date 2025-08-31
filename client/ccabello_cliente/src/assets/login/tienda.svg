@@ -1,0 +1,25 @@
+<svg class="" xml:space="preserve" style="max-height: 500px" viewBox="153.6 17.408 346.112 482.304" y="0" x="0" version="1.1" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns="http://www.w3.org/2000/svg" width="346.112" height="482.304">
+  <g>
+    <path class="" data-original="#d13330" opacity="1" d="M223.994 72a8 8 0 0 1-7.149-11.58l16-32a8 8 0 1 1 14.31 7.156l-16 32A8 8 0 0 1 223.994 72zM288.006 72a8 8 0 0 1-7.161-4.424l-16-32a8 8 0 0 1 14.31-7.156l16 32A8 8 0 0 1 288.006 72z" fill="#38000a"/>
+    <path class="" data-original="#f7b030" opacity="1" d="M32 200h448v256H32z" fill="#ffa896"/>
+    <path class="" data-original="#2978b8" opacity="1" d="M24 456h464v32H24z" fill="#9b1313"/>
+    <path class="" data-original="#f7b030" opacity="1" d="M480 200H32l48-96h352z" fill="#ffa896"/>
+    <path class="" data-original="#3397e8" opacity="1" d="M184 280h144v176H184z" fill="#cd1c18"/>
+    <path class="" data-original="#3397e8" opacity="1" d="M256 280h72v176h-72z" fill="#cd1c18"/>
+    <path class="" data-original="#e9eef2" opacity="1" d="M64 280h88v144H64zM360 280h88v144h-88z" fill="#e9eef2"/>
+    <path class="" data-original="#2978b8" opacity="1" d="M32 200h64v16a32 32 0 0 1-32 32 32 32 0 0 1-32-32v-16z" fill="#9b1313"/>
+    <path class="" data-original="#d13330" opacity="1" d="M96 200h64v16a32 32 0 0 1-32 32 32 32 0 0 1-32-32v-16z" fill="#38000a"/>
+    <path class="" data-original="#2978b8" opacity="1" d="M160 200h64v16a32 32 0 0 1-32 32 32 32 0 0 1-32-32v-16z" fill="#9b1313"/>
+    <path class="" data-original="#d13330" opacity="1" d="M224 200h64v16a32 32 0 0 1-32 32 32 32 0 0 1-32-32v-16z" fill="#38000a"/>
+    <path class="" data-original="#2978b8" opacity="1" d="M288 200h64v16a32 32 0 0 1-32 32 32 32 0 0 1-32-32v-16z" fill="#9b1313"/>
+    <path class="" data-original="#d13330" opacity="1" d="M352 200h64v16a32 32 0 0 1-32 32 32 32 0 0 1-32-32v-16z" fill="#38000a"/>
+    <path class="" data-original="#2978b8" opacity="1" d="M416 200h64v16a32 32 0 0 1-32 32 32 32 0 0 1-32-32v-16z" fill="#9b1313"/>
+    <path class="" data-original="#eb423f" opacity="1" d="M64 392h88v32H64zM360 392h88v32h-88z" fill="#eb423f"/>
+    <path class="" data-original="#d13330" opacity="1" d="M288 104h-64l-16-48h96z" fill="#38000a"/>
+    <path class="" data-original="#eb423f" opacity="1" d="m192 104-32 96H96l40-96zM288 200h-64l8-96h48zM416 200h-64l-32-96h56z" fill="#eb423f"/>
+    <g fill="#3397e8">
+      <path class="" data-original="#3397e8" opacity="1" fill="#cd1c18" d="m136 104-40 96H32l48-96zM232 104l-8 96h-64l32-96zM352 200h-64l-8-96h40zM480 200h-64l-40-96h56z"/>
+    </g>
+    <path class="" data-original="#2978b8" opacity="1" d="M248 280h16v176h-16z" fill="#9b1313"/>
+  </g>
+</svg>

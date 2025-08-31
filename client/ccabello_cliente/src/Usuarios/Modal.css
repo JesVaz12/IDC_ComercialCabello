@@ -1,0 +1,133 @@
+@import url('https://fonts.googleapis.com/css?family=Josefin+Sans');
+*{
+  font-family: 'Josefin Sans', sans-serif;
+}
+
+.modalBackground_user {
+    width: 100vw;
+    height: 100vw;
+    background-color: rgba(200, 200, 200, 0.776);
+    position: absolute;
+    z-index: 2;
+    display: flex;
+    justify-content: center;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    overflow-x: hidden;
+    overflow-y: hidden;
+
+    
+  }
+
+
+.modalContainer_user {
+    width: 55%;
+    margin-top: 4%;
+    margin-left: 23%;
+    max-height: 40%;
+    margin-right: 20%;
+    border-radius: 12px;
+    background-color: white;
+    box-shadow: rgba(0, 0, 0, 0.35) 0px 5px 15px;
+    display: flex;
+    flex-direction: column;
+    background-repeat: no-repeat;
+    background-size: 22%;
+    background-position-x: right;
+    background-position-y: bottom;
+    background-image: url(../assets/usuarios/user_bg.svg);
+  }
+
+  .header{
+    color:white;
+    display: inline-block;
+    border-top-left-radius: 8px;
+    border-top-right-radius: 8px;
+    background-color: #9B1313;
+    font-size: 250%;
+    text-align: center;
+    min-height: 10%;
+  }
+  
+  .labelModal_user{
+    color: black;
+    font-size: 180%;
+    font-weight: 300;
+    line-height: 110%;
+  }
+
+  .inputAlta_user{
+    background-color: #3A3A3A33;
+    border-width: 0;
+    margin-left: 0%;
+    font-size: 14px;
+    color: black;
+    line-height: 200%;
+    padding-bottom: 0;
+    display: inline-block;
+  }
+
+  .forms_user{
+    margin-top: 0%;
+    margin-left: 5%;
+  }
+
+  .formModal_user{
+    max-width: 80%;
+    margin-left: 7%;
+  }
+
+  .inputLabel_user{
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    flex-wrap: wrap;
+    line-height: 0%;
+    width: 50%;
+    margin-right: 15%;
+  }
+
+  #buttons{
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    margin-top: 10%;
+    margin-right: 20%;
+    margin-left: 15%;
+    font-size: 20px;
+  }
+
+  #acceptButton_user{
+    background-color: #CD1C18;
+    color: white;
+  }
+
+  button{
+    border-radius: 12px;
+  }
+  #acceptButton_user:hover{
+    border-color: white;
+    background-color: #3f992dec;
+    color:white;
+  }
+
+  #cancelButton_user:hover{
+    border-color: white;
+    background-color: #9a3e3e;
+    color:white;
+  }
+
+  #cancelButton_user{
+    color: #CD1C18;
+    background-color: #D9D9D9;
+  }
+
+  .rowInput{
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    margin-top: 5%;
+    margin-right: 25%;
+  }

@@ -1,0 +1,111 @@
+@import url('https://fonts.googleapis.com/css?family=Josefin+Sans');
+*{
+  font-family: 'Josefin Sans', sans-serif;
+}
+
+.modalBackground {
+    width: 100vw;
+    height: 100vw;
+    background-color: rgba(200, 200, 200, 0.776);
+    position: absolute;
+    z-index: 2;
+    display: flex;
+    justify-content: center;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    
+  }
+
+
+.modalContainer {
+    width: 40%;
+    margin-top: 4%;
+    max-height: 40%;
+    border-radius: 12px;
+    background-color: white;
+    box-shadow: rgba(0, 0, 0, 0.35) 0px 5px 15px;
+    display: flex;
+    flex-direction: column;
+    background-repeat: no-repeat;
+    background-size: 200%;
+    background-position: left 42%;
+    background-position-x: center;
+    background-image: url(../assets/inventario/tienda_bg.svg);
+  }
+
+  .header{
+    color:white;
+    display: inline-block;
+    border-top-left-radius: 8px;
+    border-top-right-radius: 8px;
+    background-color: #9B1313;
+    font-size: 250%;
+    text-align: center;
+    min-height: 4%;
+  }
+  
+  .labelModal{
+    color: black;
+    font-size: 220%;
+    font-weight: 300;
+    line-height: 200%;
+  }
+
+  .inputAlta{
+    background-color: #3A3A3A33;
+    border-width: 0;
+    margin-left: 10%;
+    font-size: 14px;
+    color: black;
+    line-height: 200%;
+    padding-bottom: 0;
+    display: inline-block;
+  }
+
+  .forms{
+    margin-top: 3%;
+    margin-left: 5%;
+  }
+
+  .inputLabel{
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+  }
+
+  #buttons{
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    margin-top: 10%;
+    margin-right: 20%;
+    margin-left: 15%;
+    font-size: 20px;
+  }
+
+  #acceptButton{
+    background-color: #1f9707ec;
+    color: white;
+  }
+
+  button{
+    border-radius: 12px;
+  }
+  #acceptButton:hover{
+    border-color: white;
+    background-color: #3f992dec;
+    color:white;
+  }
+
+  #cancelButton:hover{
+    border-color: white;
+    background-color: #9a3e3e;
+    color:white;
+  }
+
+  #cancelButton{
+    color: white;
+    background-color: #9B1313;
+  }
