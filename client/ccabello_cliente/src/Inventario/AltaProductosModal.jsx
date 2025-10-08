@@ -16,7 +16,7 @@ function AltaProductosModal({ closeModal }) {
     const handleSubmit = (event) => {
         event.preventDefault();
         console.log(values);
-        axios.post('http://localhost:8081/insertarProducto', values)
+        axios.post('http://localhost:8080/insertarProducto', values)
             .then(res => {
                 if (res.data.Status === 'Exito') {
                     window.location.reload();

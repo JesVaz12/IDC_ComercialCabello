@@ -48,7 +48,7 @@ class Admin_usuarios extends Component {
   async verifyUser() {
     try {
       axios.defaults.withCredentials = true;
-      const res = await axios.get('http://localhost:8081/');
+      const res = await axios.get('http://localhost:8080/');
       if (res.data.Status !== 'Exito') {
         window.location.replace('/');
         console.log(" notverified");

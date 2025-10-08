@@ -11,7 +11,7 @@ function ConfirmacionModal({ closeModal, codigo}) {
 
     const handleDelete = async (codigo) => {
             try {
-                axios.delete(`http://localhost:8081/deleteProducto/${codigo}`).then(res => {
+                axios.delete(`http://localhost:8080/deleteProducto/${codigo}`).then(res => {
                     if (res.status === 200) {
                         localStorage.setItem('showToast', 'Producto eliminado con éxito');
                         window.location.reload();
@@ -26,7 +26,7 @@ function ConfirmacionModal({ closeModal, codigo}) {
 
     useEffect(() => {
         if (codigo) {
-            axios.get(`http://localhost:8081/getProducto/${codigo}`)
+            axios.get(`http://localhost:8080/getProducto/${codigo}`)
                 .then(res => {  
                     if (res.data.Status === 'Exito') {
                         setValue({

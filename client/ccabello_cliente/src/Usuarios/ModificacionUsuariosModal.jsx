@@ -17,7 +17,7 @@ function ModificacionUsuariosModal({ closeModal, usuario }) {
 
     useEffect(() => {
         if (usuario) {
-            axios.get(`http://localhost:8081/GetUserData/${usuario}`)
+            axios.get(`http://localhost:8080/GetUserData/${usuario}`)
                 .then(res => {  
                     setValues({
                         usuario: res.data.usuario,
@@ -58,7 +58,7 @@ function ModificacionUsuariosModal({ closeModal, usuario }) {
                 document.getElementById("passerror").removeAttribute("open");
               }
             console.log(values);
-            axios.post('http://localhost:8081/update_user', values)
+            axios.post('http://localhost:8080/update_user', values)
                 .then(res => {
                     if (res.status === 200) {
                         localStorage.setItem('showToast', 'Usuario modificado con éxito');

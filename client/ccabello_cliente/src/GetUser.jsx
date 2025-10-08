@@ -7,7 +7,7 @@ function GetUser(){
     const [rol,setRol] = useState();
 
     useEffect(() => {
-        axios.get('http://localhost:8081/GetUser',{ withCredentials: true })
+        axios.get('http://localhost:8080/GetUser',{ withCredentials: true })
           .then(response => {
             const name = response.data.name;
             const rol = response.data.rol;

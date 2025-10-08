@@ -32,7 +32,7 @@ function AltaUsuariosModal({ closeModal }) {
                 document.getElementById("passerror").removeAttribute("open");
               }
             console.log(values);
-            axios.post('http://localhost:8081/register_user', values)
+            axios.post('http://localhost:8080/register_user', values)
                 .then(res => {
                     console.log(res.status)
                     if (res.status === 200) {

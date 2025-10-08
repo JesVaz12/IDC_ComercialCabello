@@ -25,11 +25,11 @@ app.use(cors({
 app.use(cookieParser());
 
 const db = mysql2.createConnection({
-    host:"localhost",
-    user:"root",
-    password:"Cabello1998",
-    database:"comercial_cabello"
-})
+    host: "mi-mysql-db",
+    user: "root",
+    password: "tuclave123",
+    database: "comercial_cabello"
+});
 
 db.connect((err) => {
     if (err) {
@@ -51,9 +51,9 @@ app.post('/register_user', (req, res) => {
         }
         bcrypt.hash(req.body.contrasena, salt, (err, hash) => {
             if(err)return res.json({Error: "Error al encriptar la contraseña"});
-            const values = [req.body.nombre.toLowerCase().replace(/(^|\s)\S/gu, c => c.toUpperCase()), 
-                req.body.apellido_paterno.toLowerCase().replace(/(^|\s)\S/gu, c => c.toUpperCase()), 
-                req.body.apellido_materno.toLowerCase().replace(/(^|\s)\S/gu, c => c.toUpperCase()), 
+            const values = [req.body.nombre.toLowerCase().replace(/(^|\s)\S/gu, c => c.toUpperCase()),
+                req.body.apellido_paterno.toLowerCase().replace(/(^|\s)\S/gu, c => c.toUpperCase()),
+                req.body.apellido_materno.toLowerCase().replace(/(^|\s)\S/gu, c => c.toUpperCase()),
                 req.body.usuario.toLowerCase(), hash, req.body.rol];
             db.query(sql, [values], (err, result) => {
                 if(err) return res.json({Error: "Error al registrar el usuario"});
@@ -77,9 +77,9 @@ app.post('/update_user', (req, res) => {
     const password_replace = "UPDATE  contrasenas SET encriptada=?, texto_plano=? WHERE encriptada=(SELECT contrasena from Trabajadores WHERE usuario=?)";
     bcrypt.hash(req.body.contrasena, salt, (err, hash) => {
         if(err)return res.json({Error: "Error al encriptar la contraseña"});
-        const values = [req.body.nombre.toLowerCase().replace(/(^|\s)\S/gu, c => c.toUpperCase()), 
-            req.body.apellido_paterno.toLowerCase().replace(/(^|\s)\S/gu, c => c.toUpperCase()), 
-            req.body.apellido_materno.toLowerCase().replace(/(^|\s)\S/gu, c => c.toUpperCase()), 
+        const values = [req.body.nombre.toLowerCase().replace(/(^|\s)\S/gu, c => c.toUpperCase()),
+            req.body.apellido_paterno.toLowerCase().replace(/(^|\s)\S/gu, c => c.toUpperCase()),
+            req.body.apellido_materno.toLowerCase().replace(/(^|\s)\S/gu, c => c.toUpperCase()),
             hash,req.body.rol, req.body.usuario];
         db.query(password_replace,[hash,req.body.contrasena,req.body.usuario] , (err, result) => {
             if (err) {
@@ -102,33 +102,62 @@ app.post('/update_user', (req, res) => {
  });
 
 app.post('/login', (req, res) => {
-    const sql = "SELECT * FROM Trabajadores WHERE usuario = ?";
-    db.query(sql, [req.body.username], (err, data) => {
-        if(err) return res.json({Error: "Error al buscar el usuario"});
-        if(data.length>0){
-            bcrypt.compare(req.body.password.toString(), data[0].contrasena, (err, response) => {
-                if(err) return res.json({Error: "Error al comparar la contrseña"});
-                if(response){
-                    const name = data[0].usuario;
-                    const token = jwt.sign({name}, "jwt-secret-key", {expiresIn: '1d'}, {path: "/"});
-                    res.cookie('token', token);
-                    return res.json({Status: "Exito"});
-                } else{
-                    return res.json({Error: "Contraseña incorrecta"});
+    try {
+        console.log("PISTA 1: Entrando en la ruta /login.");
+        const username = req.body.username;
+        const password = req.body.password;
+
+        if (!username || !password) {
+            console.log("ERROR: Usuario o contraseña no recibidos en la petición.");
+            return res.status(400).json({ Error: "Falta usuario o contraseña." });
+        }
+
+        console.log(`PISTA 2: Buscando usuario '${username}' en la base de datos.`);
+        const sql = "SELECT * FROM Trabajadores WHERE usuario = ?";
+
+        db.query(sql, [username], (err, data) => {
+            if (err) {
+                console.error("PISTA 3: ERROR de base de datos.", err);
+                return res.status(500).json({ Error: "Error en la consulta de la base de datos." });
+            }
+
+            if (data.length === 0) {
+                console.log("PISTA 4: Usuario no encontrado en la base de datos.");
+                return res.json({ Error: "Usuario no registrado" });
+            }
+
+            console.log("PISTA 5: Usuario encontrado. Procediendo a comparar contraseñas.");
+            const user = data[0];
+
+            bcrypt.compare(password.toString(), user.contrasena, (bcryptErr, response) => {
+                if (bcryptErr) {
+                    console.error("PISTA 6: ERROR en la función bcrypt.compare.", bcryptErr);
+                    return res.status(500).json({ Error: "Error en el servidor al verificar contraseña." });
                 }
 
-            })
-        }else{
-            return res.json({Error: "Usuario no registrado"});
-        }
-    })
-})
+                if (response) {
+                    console.log("PISTA 7: Contraseña CORRECTA. Login exitoso.");
+                    const name = user.usuario;
+                    const token = jwt.sign({ name }, "jwt-secret-key", { expiresIn: '1d' });
+                    res.cookie('token', token);
+                    return res.json({ Status: "Exito" });
+                } else {
+                    console.log("PISTA 8: Contraseña INCORRECTA.");
+                    return res.json({ Error: "Contraseña incorrecta" });
+                }
+            });
+        });
+    } catch (e) {
+        console.error("PISTA 9: ¡ERROR CATASTRÓFICO ATRAPADO!", e);
+        res.status(500).json({ Error: "Un error inesperado ocurrió en el servidor." });
+    }
+});
 
 app.post('/insertarProducto',(req, res) => {
     const sql = "INSERT INTO productos(codigo,nombre,precio,cantidad,cantidad_minima) VALUES(?,?,?,?,?)";
     const sql_select_codigo = "SELECT * from productos where codigo=?";
     const sql_select_nombre = "SELECT * from productos where nombre=?";
-    
+
     const num_values = [Number(req.body.codigo), Number(req.body.cantidad), Number(req.body.cantidad_minima), Number(req.body.precio)];
     const values = [req.body.codigo,req.body.nombre.toLowerCase().replace(/\b\w/g, char => char.toUpperCase()),req.body.precio,req.body.cantidad, req.body.cantidad_minima];
     db.query(sql_select_codigo, [req.body.codigo], (err,data) => {
@@ -226,7 +255,7 @@ app.get('/data', (req, res) => {
         res.status(500).json({ error: 'Internal Server Error' });
         return;
       }
-      res.json(results); 
+      res.json(results);
     });
   });
 
@@ -237,7 +266,7 @@ app.get('/data', (req, res) => {
         res.status(500).json({ error: 'Internal Server Error' });
         return;
       }
-      res.json(results); 
+      res.json(results);
     });
   });
 
@@ -249,7 +278,7 @@ app.get('/data', (req, res) => {
         res.status(500).json({ error: 'Internal Server Error' });
         return;
       }
-      res.json(results); 
+      res.json(results);
     });
   });
 
@@ -260,7 +289,7 @@ app.get('/data', (req, res) => {
         res.status(500).json({ error: 'Internal Server Error' });
         return;
       }
-      res.json(results); 
+      res.json(results);
     });
   });
 
@@ -284,9 +313,9 @@ app.get('/GetProducto/:codigo', (req, res) => {
     const codigo = req.params.codigo;
     const sql = 'DELETE FROM productos WHERE codigo = ?';
 
-    db.query(sql, [codigo], (err, result) => { 
+    db.query(sql, [codigo], (err, result) => {
         if (err) {
-            return res.status(500).json({ Error: "Error al eliminar el producto" }); 
+            return res.status(500).json({ Error: "Error al eliminar el producto" });
         }
         if (result.affectedRows > 0) {
             res.status(200).json({ message: 'Se eliminó el producto éxitosamente' });
@@ -300,9 +329,9 @@ app.delete('/deleteUsuario/:usuario', (req, res) => {
     const usuario = req.params.usuario;
     const sql = 'DELETE FROM Trabajadores WHERE usuario = ?';
 
-    db.query(sql, [usuario], (err, result) => { 
+    db.query(sql, [usuario], (err, result) => {
         if (err) {
-            return res.status(500).json({ Error: "Error al eliminar el usuario" }); 
+            return res.status(500).json({ Error: "Error al eliminar el usuario" });
         }
         if (result.affectedRows > 0) {
             res.json({ message: 'Se eliminó el usuario éxitosamente' });
@@ -355,7 +384,7 @@ app.get('/GetUser', (req, res) => {
     }
 })
 
-app.get('/GetUserData/:user', (req, res) => {  
+app.get('/GetUserData/:user', (req, res) => {
     const usuario_completo = req.params.user;
     const sql = 'SELECT * from Trabajadores, contrasenas WHERE contrasena=encriptada AND usuario = ?';
 
@@ -374,7 +403,7 @@ app.get('/GetUserData/:user', (req, res) => {
 
 
 
-app.listen(8081, () => {
+app.listen(8080, () => {
     console.log('Conectado al backend!');
 })
 
@@ -451,9 +480,9 @@ app.delete('/deleteUser/:usuario', (req, res) => {
     const codigo = req.params.usuario;
     const sql = 'DELETE FROM Trabajadores WHERE usuario = ?';
 
-    db.query(sql, [codigo], (err, result) => { 
+    db.query(sql, [codigo], (err, result) => {
         if (err) {
-            return res.status(500).json({ Error: "Error al eliminar el usuario" }); 
+            return res.status(500).json({ Error: "Error al eliminar el usuario" });
         }
         if (result.affectedRows > 0) {
             res.status(200).json({ message: 'Se eliminó el usuario éxitosamente' });
@@ -485,7 +514,7 @@ app.post('/realizarCobro', async (req, res) => {
                     const sql_insert = "INSERT INTO ventas(num_venta, producto, cantidad, total, fecha, usuario) VALUES(?,?,?,?,?,?)";
                     const valores = [num_venta, producto.codigo, producto.cantidad, req.body.costo, fechaISO, req.body.username];
                     await db.promise().query(sql_insert, valores);
-        
+
                     const sql_update = "UPDATE productos SET cantidad = cantidad - ? WHERE codigo = ?";
                     await db.promise().query(sql_update, [producto.cantidad, producto.codigo]);
 
@@ -527,7 +556,7 @@ app.get('/dataPventa', (req, res) => {
         res.status(500).json({ error: 'Internal Server Error' });
         return;
       }
-      res.json(results); 
+      res.json(results);
     });
   });
 
@@ -538,7 +567,7 @@ app.get('/dataPventa', (req, res) => {
         res.status(500).json({ error: 'Internal Server Error' });
         return;
       }
-      res.json(results); 
+      res.json(results);
     });
   });
 

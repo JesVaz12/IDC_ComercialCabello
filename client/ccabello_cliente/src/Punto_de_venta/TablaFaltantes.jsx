@@ -26,7 +26,7 @@ function TablaFaltantes({faltantes}) {
 
 /*  const handleDelete = async (codigo) => {
     try {
-      axios.delete(`http://localhost:8081/deleteProducto/${codigo}`);
+      axios.delete(`http://localhost:8080/deleteProducto/${codigo}`);
       setData(data.filter((row) => row.codigo !== codigo));
     } catch (error) {
       console.error('Error deleting data:', error);

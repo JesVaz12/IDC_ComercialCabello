@@ -22,7 +22,7 @@ function DataTableComponentFaltantes() {
   useEffect(() => {
     async function fetchData() {
       try {
-        const response = await axios.get('http://localhost:8081/dataFaltantes');
+        const response = await axios.get('http://localhost:8080/dataFaltantes');
         const processedData = response.data.map((item) => ({
           ...item,
           cantidad: parseInt(item.cantidad, 10), 

@@ -28,7 +28,7 @@ function DataTableComponent({searchTerm}) {
 
 /*  const handleDelete = async (codigo) => {
     try {
-      axios.delete(`http://localhost:8081/deleteProducto/${codigo}`);
+      axios.delete(`http://localhost:8080/deleteProducto/${codigo}`);
       setData(data.filter((row) => row.codigo !== codigo));
     } catch (error) {
       console.error('Error deleting data:', error);
@@ -51,7 +51,7 @@ function DataTableComponent({searchTerm}) {
   useEffect(() => {
     async function fetchData() {
       try {
-        const response = await axios.get('http://localhost:8081/data');
+        const response = await axios.get('http://localhost:8080/data');
         const processedData = response.data.map((item) => ({
           ...item,
           cantidad: parseInt(item.cantidad, 10), 

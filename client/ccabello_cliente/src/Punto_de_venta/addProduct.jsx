@@ -46,7 +46,7 @@ function AddProduct({ onProductSelect }) {
     async function fetchAllRecords() {
       setIsLoading(true);
       try {
-        const response = await axios.get('http://localhost:8081/dataPventa');
+        const response = await axios.get('http://localhost:8080/dataPventa');
 
         const formattedOptions = response.data.map(item => ({
           value: item.codigo,

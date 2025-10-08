@@ -13,7 +13,7 @@ function RegisterUser(){
     })
     const handleSubmit = (event) => {
         event.preventDefault();
-        axios.post('http://localhost:8081/register_user', values)
+        axios.post('http://localhost:8080/register_user', values)
         .then(res => console.log(res))
         .then(err => console.log(err));
     }

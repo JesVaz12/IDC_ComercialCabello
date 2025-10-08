@@ -16,7 +16,7 @@ function EliminarModal({ closeModal, usuario}) {
 
     const handleDelete = async (usuario) => {
         try {
-            axios.delete(`http://localhost:8081/deleteUsuario/${usuario}`).then(res => {
+            axios.delete(`http://localhost:8080/deleteUsuario/${usuario}`).then(res => {
                 if (res.status == 200) {
                     window.location.replace('/usuarios');
                 } else {
@@ -30,7 +30,7 @@ function EliminarModal({ closeModal, usuario}) {
 
     useEffect(() => {
         if (usuario) {
-            axios.get(`http://localhost:8081/GetUserData/${usuario}`)
+            axios.get(`http://localhost:8080/GetUserData/${usuario}`)
                 .then(res => {  
                     if (res.status === 200) {
                         console.log(res.data.Nombre)

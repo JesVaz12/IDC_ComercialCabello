@@ -39,7 +39,7 @@ class Faltantes extends Component {
   async verifyUser() {
     try {
       axios.defaults.withCredentials = true;
-      const res = await axios.get('http://localhost:8081/');
+      const res = await axios.get('http://localhost:8080/');
       if (res.data.Status !== 'Exito') {
         window.location.replace('/');
         console.log(" notverified");
@@ -56,7 +56,7 @@ class Faltantes extends Component {
   async descargarPdf() {
     try {
       // eslint-disable-next-line no-unused-vars
-      const response = await axios.get('http://localhost:8081/generar-pdf');
+      const response = await axios.get('http://localhost:8080/generar-pdf');
     }
     catch (error) {
       console.error('Error descargando el pdf', error);
@@ -144,7 +144,7 @@ class Faltantes extends Component {
             </div>
             <div id="headbar">
               <div style={{display: 'flex', justifyContent: 'space-between', width: '100%'}}>
-              <button className='button_faltantes' onClick={() => location.href="http://localhost:8081/generar-pdf"} style={{width: '12%'}}><img className='filter-white' src={download} style={{width: '16%', marginRight: '10%'}}></img>Descargar </button>
+              <button className='button_faltantes' onClick={() => location.href="http://localhost:8080/generar-pdf"} style={{width: '12%'}}><img className='filter-white' src={download} style={{width: '16%', marginRight: '10%'}}></img>Descargar </button>
               <button  className='button_faltantes' onClick={() => window.location.replace('/inventario')}>Inventario</button>
               </div>
             </div>

@@ -42,18 +42,18 @@ function CobrarModal({ closeModal, data}) {
       // Triggered after successful API call
       const realizarCobro = () => {
           let username = '';
-          axios.get('http://localhost:8081/GetUser', { withCredentials: true })
+          axios.get('http://localhost:8080/GetUser', { withCredentials: true })
               .then(response => {
                   username = response.data.username;
               }).then(() => {
                   if (pago >= costo) {
-                      axios.post('http://localhost:8081/realizarCobro', { pago, costo, data, username })
+                      axios.post('http://localhost:8080/realizarCobro', { pago, costo, data, username })
                           .then(res => {
                               if (res.data.Status === 'Exito') {
                                   const faltantes = res.data.Faltantes;
                                   const payload = { pago, costo, data };
                                   localStorage.setItem('showToast', 'Venta exitosa');
-                                axios.post('http://localhost:8081/imprimir-ticket', payload, {
+                                axios.post('http://localhost:8080/imprimir-ticket', payload, {
                                 responseType: 'blob' 
                                 }).then((response) => {
                                 const url = window.URL.createObjectURL(new Blob([response.data], { type: 'application/pdf' }));

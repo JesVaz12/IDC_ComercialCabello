@@ -18,7 +18,7 @@ function Login() {
     axios.defaults.withCredentials = true;
     const handleSubmit = (event) => {
         event.preventDefault();
-        axios.post('http://localhost:8081/login', values)
+        axios.post('http://localhost:8080/login', values)
         .then(res => {
             if(res.data.Status==='Exito'){
               navigate('/inventario');
@@ -51,7 +51,7 @@ function Login() {
   
     useEffect(() => {
       axios.defaults.withCredentials = true;
-      axios.get("http://localhost:8081/")
+      axios.get("http://localhost:8080/")
         .then((res) => {
           if (res.data?.Status === "Exito") {
             setShowLogin(false);

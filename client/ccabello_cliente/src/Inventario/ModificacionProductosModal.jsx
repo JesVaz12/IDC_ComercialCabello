@@ -7,7 +7,7 @@ import toast, { Toaster } from 'react-hot-toast';
 function ModificacionProductosModal({ closeModal, codigo}) {
     useEffect(() => {
         if (codigo) {
-            axios.get(`http://localhost:8081/getProducto/${codigo}`)
+            axios.get(`http://localhost:8080/getProducto/${codigo}`)
                 .then(res => {  
                     if (res.data.Status === 'Exito') {
                         setValues({
@@ -42,7 +42,7 @@ function ModificacionProductosModal({ closeModal, codigo}) {
     const handleSubmit = (event) => {
         event.preventDefault();
         console.log(values);
-        axios.post('http://localhost:8081/modificarProducto', values)
+        axios.post('http://localhost:8080/modificarProducto', values)
             .then(res => {
                 if (res.data.Status === 'Exito') {
                     localStorage.setItem('showToast', 'Producto modificado con éxito');
