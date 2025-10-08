@@ -1,0 +1,35 @@
+version: '3.8'
+
+services:
+  db:
+    image: mysql:latest
+    container_name: mi-mysql-db
+    environment:
+      MYSQL_ROOT_PASSWORD: tuclave123
+      MYSQL_DATABASE: comercial_cabello
+    volumes:
+      - ./db-init:/docker-entrypoint-initdb.d
+      - db_data:/var/lib/mysql
+    networks:
+      - mi-red
+
+  app:
+    image: node:18
+    container_name: mi-app-desarrollo
+    working_dir: /app
+    ports:
+      - "5173:5173"
+      - "8080:8080"
+    volumes:
+      - ./:/app
+    networks:
+      - mi-red
+    depends_on:
+      - db
+    command: tail -f /dev/null
+
+volumes:
+  db_data:
+
+networks:
+  mi-red:
