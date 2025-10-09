@@ -2,9 +2,9 @@ import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import Login from './Login/Login.jsx';
 import RegisterUser from './RegisterUser.jsx';
 import Inventario from './Inventario/Inventario.jsx';
-import Pventa from './punto_de_venta/pventa.jsx';
+import Pventa from './Punto_de_venta/pventa.jsx'; // <--- RUTA CORREGIDA
 import Faltantes from './Inventario/Faltantes.jsx';
-import Usuarios from './Usuarios/admin_usuarios.jsx'; // Nota: Cambié "usuarios" a "Usuarios" por convención
+import Usuarios from './Usuarios/admin_usuarios.jsx';
 
 function App() {
   return (
@@ -15,7 +15,7 @@ function App() {
         <Route path='/inventario' element={<Inventario />} />
         <Route path='/punto_de_venta' element={<Pventa />} />
         <Route path='/faltantes' element={<Faltantes />} />
-        <Route path='/usuarios' element={<Usuarios />} /> {/* Nota: Y aquí también */}
+        <Route path='/usuarios' element={<Usuarios />} />
       </Routes>
     </BrowserRouter>
   );
