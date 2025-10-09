@@ -2,9 +2,9 @@ import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import Login from './Login/Login.jsx';
 import RegisterUser from './RegisterUser.jsx';
 import Inventario from './Inventario/Inventario.jsx';
-import Pventa from './Punto_de_venta/pventa.jsx'; // <--- RUTA CORREGIDA
+import Pventa from './Punto_de_venta/pventa.jsx';
 import Faltantes from './Inventario/Faltantes.jsx';
-import Usuarios from './Usuarios/admin_usuarios.jsx';
+import Usuarios from './usuarios/admin_usuarios.jsx'; // <--- RUTA CORREGIDA
 
 function App() {
   return (
