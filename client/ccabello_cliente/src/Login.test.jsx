@@ -4,18 +4,16 @@ import { MemoryRouter } from 'react-router-dom';
 import Login from './Login/Login.jsx';
 
 describe('Login Component', () => {
-  it('debería renderizar el campo de usuario', () => {
-    // Renderizamos el componente "en memoria" para la prueba
+  it('debería renderizar el campo de usuario', async () => { // <--- 1. Añadimos 'async' aquí
     render(
       <MemoryRouter>
         <Login />
       </MemoryRouter>
     );
 
-    // Buscamos si el texto "Usuario" existe en el componente
-    const userInput = screen.getByText(/Usuario/i);
+    // 2. Cambiamos 'getByText' por 'await screen.findByText'
+    const userInput = await screen.findByText(/Usuario/i);
 
-    // Esperamos que el elemento exista
     expect(userInput).toBeInTheDocument();
   });
 });
