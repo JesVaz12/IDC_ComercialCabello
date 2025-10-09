@@ -1,11 +1,10 @@
 import { defineConfig } from 'vite'
 import react from '@vitejs/plugin-react'
 
-// https://vitejs.dev/config/
 export default defineConfig({
   plugins: [react()],
   test: {
-    environment: 'jsdom' // <-- ESTA LÍNEA ES LA SOLUCIÓN
-    setupFiles: './src/setupTests.js', // <-- AÑADE ESTA LÍNEA
+    environment: 'jsdom',
+    setupFiles: './src/setupTests.js'
   },
 })
