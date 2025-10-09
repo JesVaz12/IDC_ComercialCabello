@@ -1,0 +1,41 @@
+# Nombre de tu pipeline
+name: Pipeline de Integración Continua
+
+# Define cuándo se va a ejecutar (en cada push a la rama main)
+on:
+  push:
+    branches: [ "main" ]
+
+# Define los trabajos (jobs) que se van a realizar
+jobs:
+  build:
+    # Usa una máquina virtual de Ubuntu para ejecutar los pasos
+    runs-on: ubuntu-latest
+
+    steps:
+      # 1. Clona tu repositorio en la máquina virtual
+      - name: Clonar el repositorio
+        uses: actions/checkout@v3
+
+      # 2. Configura el entorno de Node.js
+      - name: Configurar Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '18'
+
+      # 3. Instala las dependencias del Backend
+      - name: Instalar dependencias del Backend
+        run: npm install --prefix ./backend
+
+      # 4. Instala las dependencias del Frontend
+      - name: Instalar dependencias del Frontend
+        run: npm install --prefix ./client/ccabello_cliente
+
+      # --- Etapas Futuras ---
+      # Aquí es donde añadirías los pasos para pruebas y compilación.
+      # Por ahora, nos aseguramos de que las dependencias se instalen correctamente.
+      # - name: Ejecutar pruebas
+      #   run: npm test
+      #
+      # - name: Compilar la aplicación para producción
+      #   run: npm run build --if-present
