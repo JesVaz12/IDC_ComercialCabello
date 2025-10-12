@@ -6,6 +6,7 @@ on:
   # El pipeline se ejecutará cada vez que se haga un 'git push'.
   push:
     # Específicamente, solo cuando el push sea a la rama 'main'.
+    
     branches: ["main"]
 
 # Define la lista de trabajos (jobs) que se ejecutarán.
