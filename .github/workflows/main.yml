@@ -1,30 +1,49 @@
+# El nombre que aparecerá en la pestaña "Actions" de GitHub.
 name: Pipeline de Integración Continua
 
+# Configura el "trigger" o disparador.
 on:
+  # El pipeline se ejecutará cada vez que se haga un 'git push'.
   push:
-    branches: [ "main" ]
+    # Específicamente, solo cuando el push sea a la rama 'main'.
+    branches: ["main"]
 
+# Define la lista de trabajos (jobs) que se ejecutarán.
 jobs:
+  # Nombramos nuestro primer y único trabajo como 'build'.
   build:
+    # Especifica el tipo de máquina virtual que usaremos.
+    # 'ubuntu-latest' nos da una máquina limpia con la última versión de Ubuntu.
     runs-on: ubuntu-latest
 
+    # Define la secuencia de pasos que se ejecutarán dentro del trabajo 'build'.
     steps:
+      # Paso 1: Usa una acción pre-hecha de GitHub para descargar tu código.
       - name: Clonar el repositorio
         uses: actions/checkout@v3
 
+      # Paso 2: Usa otra acción pre-hecha para instalar Node.js en la máquina.
       - name: Configurar Node.js
         uses: actions/setup-node@v3
         with:
-          node-version: '18'
+          # Especificamos que queremos usar la versión 18 de Node.js.
+          node-version: "18"
 
+      # Paso 3: Ejecuta un comando en la terminal para instalar las dependencias.
+      # '--prefix ./backend' le dice a npm que corra el comando dentro de la carpeta 'backend'.
       - name: Instalar dependencias del Backend
         run: npm install --prefix ./backend
 
+      # Paso 4: Hace lo mismo que el paso anterior, pero para la carpeta del frontend.
       - name: Instalar dependencias del Frontend
         run: npm install --prefix ./client/ccabello_cliente
 
+      # Paso 5: Ejecuta las pruebas unitarias que configuramos para el frontend.
+      # Si alguna prueba falla, todo el pipeline se detendrá aquí con un error.
       - name: Ejecutar pruebas del Frontend
         run: npm test --prefix ./client/ccabello_cliente
 
+      # Paso 6: Ejecuta el script 'build' del frontend.
+      # Esto crea una versión optimizada de tu aplicación para producción.
       - name: Compilar Frontend para producción
         run: npm run build --prefix ./client/ccabello_cliente
