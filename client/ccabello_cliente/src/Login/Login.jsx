@@ -1,122 +1,114 @@
-import { useEffect, useState } from 'react'
-import ellipse from '../assets/login/ellipse.svg'
-import tienda from '../assets/login/tienda.svg'
-import logo from '../assets/login/logo.svg'
-import './Login.css'
-import { useNavigate } from 'react-router-dom'
-import axios from 'axios'
+import { useEffect, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
+import axios from 'axios';
 
-function Login() {
+// Assuming your assets are in the correct path
+import ellipse from '../assets/login/ellipse.svg';
+import tienda from '../assets/login/tienda.svg';
+import logo from '../assets/login/logo.svg';
+
+// Assuming your CSS file is in the same directory
+import './Login.css';
+
+export default function Login() {
     const [values, setValues] = useState({
         username: '',
         password: '',
-    })
+    });
     const [showLogin, setShowLogin] = useState(false);
     const navigate = useNavigate();
-    console.log(showLogin);
+
+    // Set withCredentials to true for all axios requests
     axios.defaults.withCredentials = true;
+
+    // Function to handle form submission
     const handleSubmit = (event) => {
-        event.preventDefault();
+        event.preventDefault(); // Prevent default form submission behavior
         axios.post('http://localhost:8080/login', values)
-        .then(res => {
-            if(res.data.Status==='Exito'){
-              navigate('/inventario');
-            }else{
-                if(res.data.Error.toLowerCase().includes("usuario")){
-                  document.getElementById("usererror").innerHTML=res.data.Error;
-                  const userError = document.getElementById("usererror")
-                  if (!userError.hasAttribute("open")) {
-                    userError.toggleAttribute("open");
-                    document.getElementById("wrongpassword").removeAttribute("open");
-                  }
-                }else{
-                  document.getElementById("usererror").removeAttribute("open");
-                  if(res.data.Error.toLowerCase().includes("contraseña")){
-                    document.getElementById("wrongpassword").innerHTML=res.data.Error;
-                    const userError = document.getElementById("wrongpassword")
-                    if (!userError.hasAttribute("open")) {
-                      userError.toggleAttribute("open");
-                      document.getElementById("usererror").removeAttribute("open");
+            .then(res => {
+                if (res.data.Status === 'Exito') {
+                    navigate('/inventario'); // Navigate on successful login
+                } else {
+                    // Handle and display specific errors from the server
+                    const userErrorElement = document.getElementById("usererror");
+                    const passwordErrorElement = document.getElementById("wrongpassword");
+
+                    if (res.data.Error.toLowerCase().includes("usuario")) {
+                        userErrorElement.innerText = res.data.Error;
+                        userErrorElement.style.display = 'block';
+                        passwordErrorElement.style.display = 'none';
+                    } else if (res.data.Error.toLowerCase().includes("contraseña")) {
+                        passwordErrorElement.innerText = res.data.Error;
+                        passwordErrorElement.style.display = 'block';
+                        userErrorElement.style.display = 'none';
                     }
-                  }else{
-                    document.getElementById("wrongpassword").removeAttribute("open");
-                  }
                 }
-            }
-        })
-        .then(err => console.log(err));
-    }
+            })
+            .catch(err => console.log(err)); // Log any other errors
+    };
 
+    // useEffect to check for an existing session when the component mounts
     useEffect(() => {
-      axios.defaults.withCredentials = true;
-      axios.get("http://localhost:8080/")
-        .then((res) => {
-          if (res.data?.Status === "Exito") {
-            setShowLogin(false);
-            navigate("/inventario");
-          }else{
-            setShowLogin(true);
-          }
-        })
-        // eslint-disable-next-line no-unused-vars
-        .catch((error) => {
-          setShowLogin(true);
-        });
-
-    }, []);
+        axios.get("http://localhost:8080/")
+            .then((res) => {
+                if (res.data?.Status === "Exito") {
+                    setShowLogin(false);
+                    navigate("/inventario"); // If already logged in, redirect
+                } else {
+                    setShowLogin(true); // If not logged in, show the login form
+                }
+            })
+            .catch(() => {
+                setShowLogin(true); // Show login form on any error (e.g., server down)
+            });
+    }, [navigate]);
 
     return (
-      <>
-      {  showLogin ?(
-        <div className='layout'>
-          <div className='horizontal_layout'>
-            <div className='tienda_logo'>
-              <img src={ellipse} className="ellipse" alt="React logo" />
-              <img src={tienda} className="tienda" alt="React logo" />
-            </div>
-            <div className="login">
-              <img src={logo} className='logo' alt='logo' />
-              <form onSubmit={handleSubmit} required id="loginform">
-                <p className='label'>Usuario</p>
-                <label> 
-                  <input className='input'
-                    type="text" 
-                    required
-                    data-error="Usuario no registrado"
-                    maxLength={20}
-                    name='username'
-                    onChange={(e) => setValues({...values, username: e.target.value})}
-                  />
-                  <error id="usererror" style={{color: "red", marginLeft: "36%", fontSize: "140%"}}>Hola soy un texto</error>
-                </label>
-                <p className='label'>Contraseña</p>
-                <label> 
-                  <input className='input'
-                    type="password" 
-                    required
-                    data-error="Contraseña incorrecta"
-                    maxLength={20}
-                    name='password'
-                    onChange={(e) => setValues({...values, password: e.target.value})}
-                  />
-                  <error id="wrongpassword" style={{color: "red", marginLeft: "36%", fontSize: "140%"}}>Hola soy un texto</error>
-                </label>
-                <label>
-                  <button type="submit" className='button'>INGRESAR</button>
-                </label>
-              </form>
-            </div>
-          </div>
-          <div className='rectangle'>
-          </div>
-        </div>
-      ) : (
-        <div>
-        </div>
-      )
-      }
-      </>
-    )
-}
+        <>
+            {showLogin ? (
+                <div className='layout'>
+                    <div className='horizontal_layout'>
+                        <div className='tienda_logo'>
+                            <img src={ellipse} className="ellipse" alt="ellipse background" />
+                            <img src={tienda} className="tienda" alt="store icon" />
+                        </div>
+                        <div className="login">
+                            <img src={logo} className='logo' alt='company logo' />
+                            <form onSubmit={handleSubmit} noValidate>
+                                <label htmlFor="username" className='label'>Usuario</label>
+                                <input
+                                    id="username"
+                                    className='input'
+                                    name="username"
+                                    type="text"
+                                    maxLength={20}
+                                    required
+                                    onChange={(e) => setValues({ ...values, username: e.target.value })}
+                                />
+                                <small id="usererror" style={{ color: "red", display: 'none', marginLeft: "36%" }}></small>
 
-export default Login;
+                                <label htmlFor="password" className='label'>Contraseña</label>
+                                <input
+                                    id="password"
+                                    className='input'
+                                    name="password"
+                                    type="password"
+                                    maxLength={20}
+                                    required
+                                    onChange={(e) => setValues({ ...values, password: e.target.value })}
+                                />
+                                <small id="wrongpassword" style={{ color: "red", display: 'none', marginLeft: "36%" }}></small>
+
+                                <button type="submit" className='button'>INGRESAR</button>
+                            </form>
+                        </div>
+                    </div>
+                    <div className='rectangle'></div>
+                </div>
+            ) : (
+                // Render nothing or a loading spinner while checking auth status
+                <div></div>
+            )}
+        </>
+    );
+}
