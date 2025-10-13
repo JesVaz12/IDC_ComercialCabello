@@ -87,7 +87,7 @@ export default function Login() {
                                 />
                                 <small id="usererror" style={{ color: "red", display: 'none', marginLeft: "36%" }}></small>
 
-                                <label htmlFor="password" className='label'>contraseña</label>
+                                <label htmlFor="password" className='label'>Contraseña</label>
                                 <input
                                     id="password"
                                     className='input'
@@ -99,7 +99,7 @@ export default function Login() {
                                 />
                                 <small id="wrongpassword" style={{ color: "red", display: 'none', marginLeft: "36%" }}></small>
 
-                                <button type="submit" className='button'>INGRESAR</button>
+                                <button type="submit" className='button'></button>
                             </form>
                         </div>
                     </div>
