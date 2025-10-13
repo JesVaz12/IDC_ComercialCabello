@@ -99,7 +99,7 @@ export default function Login() {
                                 />
                                 <small id="wrongpassword" style={{ color: "red", display: 'none', marginLeft: "36%" }}></small>
 
-                                <button type="submit" className='button'></button>
+                                <button type="submit" className='button'>INGRESAR</button>
                             </form>
                         </div>
                     </div>
