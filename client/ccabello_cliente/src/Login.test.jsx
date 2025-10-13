@@ -16,4 +16,14 @@ describe('Login Component', () => {
 
     expect(userInput).toBeInTheDocument();
   });
+  it('debería renderizar el botón de ingresar', async () => {
+  render(
+    <MemoryRouter>
+      <Login />
+    </MemoryRouter>
+  );
+
+  const button = await screen.findByRole('button', { name: /ingresar/i });
+  expect(button).toBeInTheDocument();
+});
 });
