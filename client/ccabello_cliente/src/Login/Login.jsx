@@ -1,93 +1,125 @@
-import React, { useEffect, useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
-import './Login.css';
-import axios from 'axios';
-import Swal from 'sweetalert2';
+import { useEffect, useState } from 'react'
+import ellipse from '../assets/login/ellipse.svg'
+import tienda from '../assets/login/tienda.svg'
+import logo from '../assets/login/logo.svg'
+import './Login.css'
+import { useNavigate } from 'react-router-dom'
+import axios from 'axios'
+
 
 function Login() {
     const [values, setValues] = useState({
         username: '',
-        password: ''
-    });
-
-    const navigate = useNavigate();
-    axios.defaults.withCredentials = true;
+        password: '',
+    })
     const [showLogin, setShowLogin] = useState(false);
-
-    const handleInput = (event) => {
-        setValues(prev => ({ ...prev, [event.target.name]: event.target.value }));
-    };
-
+    const navigate = useNavigate();
+    console.log(showLogin);
+    axios.defaults.withCredentials = true;
     const handleSubmit = (event) => {
         event.preventDefault();
         axios.post('http://localhost:8080/login', values)
-            .then(res => {
-                if (res.data.Status === "Exito") {
-                    navigate('/inventario');
-                } else {
-                    Swal.fire({
-                        position: 'top-end',
-                        icon: 'error',
-                        title: res.data.Error,
-                        showConfirmButton: false,
-                        timer: 1500
-                    });
+        .then(res => {
+            if(res.data.Status==='Exito'){
+              navigate('/inventario');
+            }else{
+                if(res.data.Error.toLowerCase().includes("usuario")){
+                  document.getElementById("usererror").innerHTML=res.data.Error;
+                  const userError = document.getElementById("usererror")
+                  if (!userError.hasAttribute("open")) {
+                    userError.toggleAttribute("open");
+                    document.getElementById("wrongpassword").removeAttribute("open");
+                  }
+                }else{
+                  document.getElementById("usererror").removeAttribute("open");
+                  if(res.data.Error.toLowerCase().includes("contraseña")){
+                    document.getElementById("wrongpassword").innerHTML=res.data.Error;
+                    const userError = document.getElementById("wrongpassword")
+                    if (!userError.hasAttribute("open")) {
+                      userError.toggleAttribute("open");
+                      document.getElementById("usererror").removeAttribute("open");
+                    }
+                  }else{
+                    document.getElementById("wrongpassword").removeAttribute("open");
+                  }
                 }
-            })
-            .catch(err => console.log(err));
-    };
-
-    useEffect(() => {
-        axios.get("http://localhost:8080/")
-            .then(res => {
-                if (res.data.Status === "Exito") {
-                    navigate('/inventario');
-                } else {
-                    setShowLogin(true);
-                }
-            })
-            .catch(err => {
-                setShowLogin(true);
-            });
-    }, []);
-
-
-    if (!showLogin) {
-        return null;
+            }
+        })
+        .then(err => console.log(err));
     }
 
-    return (
-        <div className='login-container'>
-            <div className='login-box'>
-                <p className='title'>Comercial Cabello</p>
-                <form onSubmit={handleSubmit}>
-                    {/* CORRECCIÓN 1: Se usa 'label' para evitar texto duplicado */}
-                    <label className='label' htmlFor='username'>Usuario</label>
-                    <input
-                        className='input'
-                        type="text"
-                        placeholder='Ingrese su usuario'
-                        name='username'
-                        onChange={handleInput}
-                        id='username'
-                    />
-                    
-                    <label className='label' htmlFor='password'>Contraseña</label>
-                    <input
-                        className='input'
-                        type="password"
-                        placeholder='Ingrese su contraseña'
-                        name='password'
-                        onChange={handleInput}
-                        id='password'
-                    />
-                    
-                    {/* CORRECCIÓN 2: El botón ahora es un elemento <button> */}
-                    <button className='button' type='submit'>Ingresar</button>
-                </form>
-            </div>
-        </div>
-    );
-}
+  
+    useEffect(() => {
+      axios.defaults.withCredentials = true;
+      axios.get("http://localhost:8080/")
+        .then((res) => {
+          if (res.data?.Status === "Exito") {
+            setShowLogin(false);
+            navigate("/inventario");
+          }else{
+            setShowLogin(true);
+          }
+        })
+        // eslint-disable-next-line no-unused-vars
+        .catch((error) => {
+          setShowLogin(true);
+        });
+  
+    }, []);
 
-export default Login;
+    return (
+      <>
+      {  showLogin ?(
+                <div className='layout'>
+                <div className='horizontal_layout'>
+                  <div className='tienda_logo'>
+                  <img src={ellipse} className="ellipse" alt="React logo" />
+                  <img src={tienda} className="tienda" alt="React logo" />
+                  </div>
+                  <div className="login">
+                  <img src={logo} className='logo' alt='logo' />
+                  <form onSubmit={handleSubmit} required id="loginform">
+                    <p className='label'>Usuario</p>
+                    <label> 
+                      <input className='input'
+                        type="text" 
+                        required
+                        data-error="Usuario no registrado"
+                        maxLength={20}
+                        name='username'
+                        onChange={(e) => setValues({...values, username: e.target.value})}
+                      />
+                      <error id="usererror" style={{color: "red", marginLeft: "36%", fontSize: "140%"}}>Hola soy un texto</error>
+                    </label>
+                    <p className='label'>Contraseña</p>
+                    <label> 
+                      <input className='input'
+                        type="password" 
+                        required
+                        data-error="Contraseña incorrecta"
+                        maxLength={20}
+                        name='password'
+                        onChange={(e) => setValues({...values, password: e.target.value})}
+                      />
+                        <error id="wrongpassword" style={{color: "red", marginLeft: "36%", fontSize: "140%"}}>Hola soy un texto</error>
+                    </label>
+                    <label>
+                    <button type="submit" className='button'>INGRESAR</button>
+                    </label>
+                  </form>
+                </div>
+                </div>
+                <div className='rectangle'>
+                  </div>
+               </div>
+      ) : (
+        <div>
+          
+        </div>
+      )
+      }
+      </>
+    )
+  }
+
+  export default Login;

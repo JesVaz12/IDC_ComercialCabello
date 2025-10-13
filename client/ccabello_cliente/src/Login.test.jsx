@@ -32,7 +32,7 @@ describe('Login Component', () => {
         <Login />
       </MemoryRouter>
     );
-    // CORRECCIÓN: Busca "contraseña" con 'c' minúscula
+    
     const passwordInput = await screen.findByText(/contraseña/i);
     expect(passwordInput).toBeInTheDocument();
   });

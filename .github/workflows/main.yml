@@ -1,50 +1,50 @@
-# El nombre que aparecerá en la pestaña "Actions" de GitHub.
+# Nombre de tu pipeline
 name: Pipeline de Integración Continua
 
-# Configura el "trigger" o disparador.
+# Define cuándo se va a ejecutar (en cada push a la rama main)
 on:
-  # El pipeline se ejecutará cada vez que se haga un 'git push'.
   push:
-    # Específicamente, solo cuando el push sea a la rama 'main'.
-    
-    branches: ["main"]
+    branches: [ "main" ]
 
-# Define la lista de trabajos (jobs) que se ejecutarán.
+# Define los trabajos (jobs) que se van a realizar
 jobs:
-  # Nombramos nuestro primer y único trabajo como 'build'.
   build:
-    # Especifica el tipo de máquina virtual que usaremos.
-    # 'ubuntu-latest' nos da una máquina limpia con la última versión de Ubuntu.
+    # Usa una máquina virtual de Ubuntu para ejecutar los pasos
     runs-on: ubuntu-latest
 
-    # Define la secuencia de pasos que se ejecutarán dentro del trabajo 'build'.
+    # Define la secuencia de pasos que se ejecutarán
     steps:
-      # Paso 1: Usa una acción pre-hecha de GitHub para descargar tu código.
+      # Paso 1: Descargar tu código
       - name: Clonar el repositorio
         uses: actions/checkout@v3
 
-      # Paso 2: Usa otra acción pre-hecha para instalar Node.js en la máquina.
+      # Paso 2: Instalar Node.js
       - name: Configurar Node.js
         uses: actions/setup-node@v3
         with:
-          # Especificamos que queremos usar la versión 18 de Node.js.
-          node-version: "18"
+          node-version: '18'
 
-      # Paso 3: Ejecuta un comando en la terminal para instalar las dependencias.
-      # '--prefix ./backend' le dice a npm que corra el comando dentro de la carpeta 'backend'.
+      # Paso 3: Instalar dependencias del Backend
       - name: Instalar dependencias del Backend
-        run: npm install --prefix ./backend
+        run: |
+          echo ">>> Iniciando instalación de dependencias del backend..."
+          npm install --prefix ./backend
 
-      # Paso 4: Hace lo mismo que el paso anterior, pero para la carpeta del frontend.
+      # Paso 4: Instalar dependencias del Frontend
       - name: Instalar dependencias del Frontend
-        run: npm install --prefix ./client/ccabello_cliente
+        run: |
+          echo ">>> Iniciando instalación de dependencias del frontend..."
+          npm install --prefix ./client/ccabello_cliente
 
-      # Paso 5: Ejecuta las pruebas unitarias que configuramos para el frontend.
-      # Si alguna prueba falla, todo el pipeline se detendrá aquí con un error.
+      # Paso 5: Ejecutar pruebas
       - name: Ejecutar pruebas del Frontend
-        run: npm test --prefix ./client/ccabello_cliente
+        run: |
+          echo ">>> Ejecutando pruebas unitarias con Vitest..."
+          npm test --prefix ./client/ccabello_cliente
 
-      # Paso 6: Ejecuta el script 'build' del frontend.
-      # Esto crea una versión optimizada de tu aplicación para producción.
+      # Paso 6: Compilar la aplicación
       - name: Compilar Frontend para producción
-        run: npm run build --prefix ./client/ccabello_cliente
+        run: |
+          echo ">>> Compilando la aplicación de React con Vite..."
+          npm run build --prefix ./client/ccabello_cliente
+          echo ">>> ¡Compilación finalizada con éxito!"
