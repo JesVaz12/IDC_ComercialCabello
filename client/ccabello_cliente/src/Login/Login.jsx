@@ -6,7 +6,6 @@ import './Login.css'
 import { useNavigate } from 'react-router-dom'
 import axios from 'axios'
 
-
 function Login() {
     const [values, setValues] = useState({
         username: '',
@@ -48,7 +47,6 @@ function Login() {
         .then(err => console.log(err));
     }
 
-  
     useEffect(() => {
       axios.defaults.withCredentials = true;
       axios.get("http://localhost:8080/")
@@ -64,62 +62,61 @@ function Login() {
         .catch((error) => {
           setShowLogin(true);
         });
-  
+
     }, []);
 
     return (
       <>
       {  showLogin ?(
-                <div className='layout'>
-                <div className='horizontal_layout'>
-                  <div className='tienda_logo'>
-                  <img src={ellipse} className="ellipse" alt="React logo" />
-                  <img src={tienda} className="tienda" alt="React logo" />
-                  </div>
-                  <div className="login">
-                  <img src={logo} className='logo' alt='logo' />
-                  <form onSubmit={handleSubmit} required id="loginform">
-                    <p className='label'>Usuario</p>
-                    <label> 
-                      <input className='input'
-                        type="text" 
-                        required
-                        data-error="Usuario no registrado"
-                        maxLength={20}
-                        name='username'
-                        onChange={(e) => setValues({...values, username: e.target.value})}
-                      />
-                      <error id="usererror" style={{color: "red", marginLeft: "36%", fontSize: "140%"}}>Hola soy un texto</error>
-                    </label>
-                    <p className='label'>Contraseña</p>
-                    <label> 
-                      <input className='input'
-                        type="password" 
-                        required
-                        data-error="Contraseña incorrecta"
-                        maxLength={20}
-                        name='password'
-                        onChange={(e) => setValues({...values, password: e.target.value})}
-                      />
-                        <error id="wrongpassword" style={{color: "red", marginLeft: "36%", fontSize: "140%"}}>Hola soy un texto</error>
-                    </label>
-                    <label>
-                    <button type="submit" className='button'>INGRESAR</button>
-                    </label>
-                  </form>
-                </div>
-                </div>
-                <div className='rectangle'>
-                  </div>
-               </div>
+        <div className='layout'>
+          <div className='horizontal_layout'>
+            <div className='tienda_logo'>
+              <img src={ellipse} className="ellipse" alt="React logo" />
+              <img src={tienda} className="tienda" alt="React logo" />
+            </div>
+            <div className="login">
+              <img src={logo} className='logo' alt='logo' />
+              <form onSubmit={handleSubmit} required id="loginform">
+                <p className='label'>Usuario</p>
+                <label> 
+                  <input className='input'
+                    type="text" 
+                    required
+                    data-error="Usuario no registrado"
+                    maxLength={20}
+                    name='username'
+                    onChange={(e) => setValues({...values, username: e.target.value})}
+                  />
+                  <error id="usererror" style={{color: "red", marginLeft: "36%", fontSize: "140%"}}>Hola soy un texto</error>
+                </label>
+                <p className='label'>Contraseña</p>
+                <label> 
+                  <input className='input'
+                    type="password" 
+                    required
+                    data-error="Contraseña incorrecta"
+                    maxLength={20}
+                    name='password'
+                    onChange={(e) => setValues({...values, password: e.target.value})}
+                  />
+                  <error id="wrongpassword" style={{color: "red", marginLeft: "36%", fontSize: "140%"}}>Hola soy un texto</error>
+                </label>
+                <label>
+                  <button type="submit" className='button'>INGRESAR</button>
+                </label>
+              </form>
+            </div>
+          </div>
+          <div className='rectangle'>
+          </div>
+        </div>
       ) : (
         <div>
-          
         </div>
       )
       }
       </>
     )
-  }
+}
 
-  export default Login;
+export default Login;
