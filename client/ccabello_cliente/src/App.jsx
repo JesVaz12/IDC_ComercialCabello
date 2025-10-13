@@ -4,7 +4,7 @@ import RegisterUser from './RegisterUser.jsx';
 import Inventario from './Inventario/Inventario.jsx';
 import Pventa from './Punto_de_venta/pventa.jsx';
 import Faltantes from './Inventario/Faltantes.jsx';
-import Usuarios from './usuarios/admin_usuarios.jsx';
+import Usuarios from './Usuarios/Admin_usuarios.jsx';
 
 function App() {
   return (
