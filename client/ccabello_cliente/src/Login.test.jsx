@@ -22,7 +22,7 @@ describe('Login Component', () => {
       </MemoryRouter>
     );
 
-    const button = await screen.findByRole('button', { name: /ingresar/i });
+    const button = await screen.findByRole('button', { name: /INGRESAR/i });
     expect(button).toBeInTheDocument();
   });
 
@@ -33,7 +33,7 @@ describe('Login Component', () => {
       </MemoryRouter>
     );
     
-    const passwordInput = await screen.findByText(/contraseña/i);
+    const passwordInput = await screen.findByText(/Contraseña/i);
     expect(passwordInput).toBeInTheDocument();
   });
 });
