@@ -84,6 +84,7 @@ Para ejecutar este proyecto, solo necesitas tener instalado lo siguiente en tu c
 * **Para iniciar de nuevo (una vez ya construido):**
     ```bash
     docker-compose up -d
+<<<<<<< HEAD
 
-* **Archivo modificado por Rama de Jesus y Braulio Final**
+* **Archivo modificado por Rama de Jesus Final**
 
