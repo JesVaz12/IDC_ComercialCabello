@@ -85,4 +85,5 @@ Para ejecutar este proyecto, solo necesitas tener instalado lo siguiente en tu c
     ```bash
     docker-compose up -d
 
-* **Archivo modificado por Rama de Jesus Final**
+* **Archivo modificado por Rama de Jesus y Braulio Final**
+
