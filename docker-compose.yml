@@ -1,5 +1,5 @@
-
 services:
+  # 1. SERVICIO DE BASE DE DATOS (Sin cambios)
   db:
     image: mysql:latest
     container_name: mi-mysql-db
@@ -12,20 +12,44 @@ services:
     networks:
       - mi-red
 
-  app:
-    image: node:18
-    container_name: mi-app-desarrollo
-    working_dir: /app
+  # 2. SERVICIO DEL FRONTEND (Casi sin cambios)
+  frontend: # Renombrado de 'app' a 'frontend' para más claridad
+    image: node:20
+    container_name: mi-app-frontend
+    working_dir: /app/client/ccabello_cliente
     ports:
-      - "5173:5173"
-      - "8080:8080"
+      - "5173:5173" # Puerto para el frontend
     volumes:
       - ./:/app
+      - /app/client/ccabello_cliente/node_modules
     networks:
       - mi-red
     depends_on:
       - db
-    command: tail -f /dev/null
+    command: sh -c "npm install && npm run dev -- --host 0.0.0.0"
+
+  # 3. SERVICIO DEL BACKEND (¡NUEVO!)
+  backend:
+    image: node:20 # Usamos la misma imagen de Node
+    container_name: mi-app-backend
+    working_dir: /app/backend # Directorio del backend
+    ports:
+      - "8080:8080" # Puerto para el backend
+    volumes:
+      - ./:/app
+      - /app/backend/node_modules # Volumen para los node_modules del backend
+    networks:
+      - mi-red
+    depends_on:
+      - db # El backend también depende de la base de datos
+    command: sh -c "npm install && npm run start" # Comando para iniciar el backend
+    environment:
+      # Es posible que tu backend necesite saber dónde está la DB.
+      # Si no conecta, ajustaremos las variables de entorno.
+      DB_HOST: mi-mysql-db 
+      DB_USER: root
+      DB_PASSWORD: tuclave123
+      DB_NAME: comercial_cabello
 
 volumes:
   db_data:
