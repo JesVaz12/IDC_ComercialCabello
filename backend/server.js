@@ -13,22 +13,25 @@ import { fileURLToPath } from 'url';
 
 const app = express();
 
+// --- CORRECCIÓN 1: Un solo bloque CORS para ambos ambientes ---
+app.use(cors({
+    origin: ["http://localhost:8082", "http://localhost:5173"], // Permite staging y desarrollo
+    methods: ["POST", "GET", "PUT", "DELETE"],
+    credentials: true
+}));
+
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
 app.use(express.json());
-app.use(cors({
-    origin: ["http://localhost:5173"],
-    methods: ["POST", "GET", "DELETE", "OPTIONS"],
-    credentials: true
-}));
 app.use(cookieParser());
 
+// --- CORRECCIÓN 2: Usar variables de entorno para la conexión ---
 const db = mysql2.createConnection({
-    host: "mi-mysql-db",
-    user: "root",
-    password: "tuclave123",
-    database: "comercial_cabello"
+    host: process.env.DB_HOST,
+    user: process.env.DB_USER,
+    password: process.env.DB_PASSWORD,
+    database: process.env.DB_NAME
 });
 
 db.connect((err) => {
@@ -39,6 +42,7 @@ db.connect((err) => {
     console.log('Connected to the database as ID ' + db.threadId);
 });
 
+// ... (El resto de tu código de rutas, app.listen, etc., va aquí) ...
 app.post('/register_user', (req, res) => {
     const sql = "INSERT INTO Trabajadores(`nombre`,`apellido_paterno`,`apellido_materno`,`usuario`,`contrasena`,`rol`) VALUES (?)";
     const sql_select = "SELECT * from Trabajadores where usuario=?";

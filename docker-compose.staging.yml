@@ -1,0 +1,59 @@
+services:
+  mi-mysql-db: # El nombre que busca el backend
+    image: mysql:latest
+    container_name: staging-mysql-db
+    environment:
+      MYSQL_ROOT_PASSWORD: ${STAGING_DB_PASSWORD}
+      MYSQL_DATABASE: comercial_cabello
+    volumes:
+      - ./db-init:/docker-entrypoint-initdb.d
+      - staging_db_data:/var/lib/mysql
+    networks:
+      - staging-red
+    # --- AÑADIDO: CHEQUEO DE SALUD ---
+    # Esto revisa si MySQL está listo para aceptar conexiones
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "root", "-p${MYSQL_ROOT_PASSWORD}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 30s # Dale 30 segundos para que inicie antes de checar
+
+  backend:
+    build:
+      context: .
+      dockerfile: backend.Dockerfile
+    container_name: staging-app-backend
+    ports:
+      - "8080:8080"
+    networks:
+      - staging-red
+    # --- MODIFICADO: depends_on ahora espera a que el healthcheck pase ---
+    depends_on:
+      mi-mysql-db:
+        condition: service_healthy 
+    environment:
+      # Variables que enviaremos al backend
+      DB_HOST: mi-mysql-db
+      DB_USER: root
+      DB_PASSWORD: ${STAGING_DB_PASSWORD}
+      DB_NAME: comercial_cabello
+    command: sh -c "npm install && npm run start"
+
+  frontend:
+    build:
+      context: .
+      dockerfile: client.Dockerfile
+    container_name: staging-app-frontend
+    ports:
+      - "8082:80"
+    networks:
+      - staging-red
+    depends_on:
+      - backend
+
+volumes:
+  staging_db_data:
+
+networks:
+  staging-red:
