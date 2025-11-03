@@ -46,7 +46,7 @@ describe('Login Component', () => {
     );
 
     // 5. Usa "findBy..." (asíncrono)
-    const button = await screen.findByRole('button', { name: /INGRESAR/i });
+    const button = screen.getByRole('button', { name: /INGRESAR/i });
     expect(button).toBeInTheDocument();
   });
 });
