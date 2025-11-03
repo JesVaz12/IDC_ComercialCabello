@@ -4,36 +4,33 @@ import { MemoryRouter } from 'react-router-dom';
 import Login from './Login/Login.jsx';
 
 describe('Login Component', () => {
-  it('debería renderizar el campo de usuario', async () => {
+  // Función helper para renderizar el componente antes de cada prueba
+  const setup = () => {
     render(
       <MemoryRouter>
         <Login />
       </MemoryRouter>
     );
+  };
 
-    const userInput = await screen.findByText(/Usuario/i);
+  it('debería renderizar el campo de usuario', () => {
+    setup();
+    // CORREGIDO: Usamos getByLabelText para ser más específicos
+    const userInput = screen.getByLabelText(/Usuario/i);
     expect(userInput).toBeInTheDocument();
   });
 
-  it('debería renderizar el botón de ingresar', async () => {
-    render(
-      <MemoryRouter>
-        <Login />
-      </MemoryRouter>
-    );
-
-    const button = await screen.findByRole('button', { name: /INGRESAR/i });
-    expect(button).toBeInTheDocument();
+  it('debería renderizar el campo de contraseña', () => {
+    setup();
+    // PERFECTO: Esta es la corrección que hiciste
+    const passwordInput = screen.getByLabelText(/Contraseña/i);
+    expect(passwordInput).toBeInTheDocument();
   });
 
-  it('debería renderizar el campo de contraseña', async () => {
-    render(
-      <MemoryRouter>
-        <Login />
-      </MemoryRouter>
-    );
-    
-    const passwordInput = await screen.findByText(/Contraseña/i);
-    expect(passwordInput).toBeInTheDocument();
+  it('debería renderizar el botón de ingresar', () => {
+    setup();
+    // BIEN: getByRole también es una excelente forma de seleccionar
+    const button = screen.getByRole('button', { name: /INGRESAR/i });
+    expect(button).toBeInTheDocument();
   });
 });
