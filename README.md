@@ -38,7 +38,7 @@ Para ejecutar este proyecto, solo necesitas tener instalado lo siguiente en tu c
 1.  **Clona el Repositorio**
     Abre una terminal y clona el proyecto desde GitHub:
     ```bash
-    git clone [https://github.com/JesVaz12/IDC_ComercialCabello.git](https://github.com/JesVaz12/IDC_ComercialCabello.git)
+    git clone https://github.com/JesVaz12/IDC_ComercialCabello.git
     ```
 
 2.  **Navega a la Carpeta del Proyecto**
