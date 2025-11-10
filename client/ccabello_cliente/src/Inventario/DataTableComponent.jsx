@@ -1,20 +1,22 @@
-import  { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import DataTable from 'react-data-table-component';
 import axios from 'axios';
-import delIcon from '../assets/inventario/-.svg'
 import PropTypes from 'prop-types';
-import modIcon from '../assets/inventario/modIcon.svg'
-import ModificacionProductosModal from './ModificacionProductosModal';
-import EliminarModal from './EliminarModal';
+import modIcon from '../assets/inventario/modIcon.svg';
+// --- CORRECCIÓN: Se añaden extensiones .jsx para ayudar al build ---
+import ModificacionProductosModal from './ModificacionProductosModal.jsx';
+import EliminarModal from './EliminarModal.jsx';
 
-function DataTableComponent({searchTerm}) {
-  const[filteredData, setFilteredData] = useState([]);
+function DataTableComponent({ searchTerm }) {
+  const [filteredData, setFilteredData] = useState([]);
   const [data, setData] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [openModal, setOpenModal] = useState(false);
   const [openModalDelete, setOpenModalDelete] = useState(false);
   const [selectedCodigo, setSelectedCodigo] = useState(null);
+  
+  // Estilos de la cabecera
   const customStyles = {
     headRow: {
       style: {
@@ -24,80 +26,106 @@ function DataTableComponent({searchTerm}) {
         height: "200%",
       },
     },
-  }
+  };
 
-/*  const handleDelete = async (codigo) => {
-    try {
-      axios.delete(`http://localhost:8080/deleteProducto/${codigo}`);
-      setData(data.filter((row) => row.codigo !== codigo));
-    } catch (error) {
-      console.error('Error deleting data:', error);
-    }
-  };*/
-
+  // --- ESTA ES TU NUEVA FUNCIONALIDAD ---
+  /**
+   * Define los estilos condicionales para las filas de la tabla.
+   * Si la cantidad es menor a 5, la fila se resalta en rojo claro.
+   */
+  const conditionalRowStyles = [
+    {
+      when: row => row.cantidad < 5, // La condición
+      style: {
+        backgroundColor: 'rgba(255, 68, 68, 0.2)', // Un rojo claro semi-transparente
+        color: '#B80000', // Un color de texto más oscuro para legibilidad
+        '&:hover': {
+          backgroundColor: 'rgba(255, 68, 68, 0.3)', // Un poco más oscuro en hover
+        },
+      },
+    },
+  ];
+  // --- FIN DE LA NUEVA FUNCIONALIDAD ---
 
   const handleDelete = async (codigo) => {
     setSelectedCodigo(codigo);
     setOpenModalDelete(true);
-    {openModal && <EliminarModal closeModal={setOpenModal} codigo={selectedCodigo}/>}
   };
 
-  const handleModify = async (codigo) => {
+  const handleModify = (codigo) => {
     setSelectedCodigo(codigo);
     setOpenModal(true);
-    {openModal && <ModificacionProductosModal closeModal={setOpenModal} codigo={selectedCodigo}/>}
   };
 
   useEffect(() => {
-    async function fetchData() {
+    const fetchData = async () => {
       try {
         const response = await axios.get('http://localhost:8080/data');
-        const processedData = response.data.map((item) => ({
-          ...item,
-          cantidad: parseInt(item.cantidad, 10), 
-          precio: parseFloat(item.precio), 
-          cantidad_minima: parseInt(item.cantidad_minima, 10), 
-        }));
-        setData(processedData);
-        setLoading(false);
-      } catch (err) {
-        setError(err);
+        setData(response.data);
+        setFilteredData(response.data);
+      } catch (error) {
+        setError(error);
+      } finally {
         setLoading(false);
       }
-    }
+    };
     fetchData();
   }, []);
 
-
-
   useEffect(() => {
-    if (searchTerm) {
-      setFilteredData(data.filter((item) => {
-        return (
-          item.nombre.toLowerCase().indexOf(searchTerm.toLowerCase()) !== -1 ||  
-          item.codigo.indexOf(searchTerm) !== -1
-        );
-      }));
+    if (searchTerm === null) {
+      setFilteredData(data);
+      return;
+    }
+    
+    if (searchTerm && searchTerm.value !== undefined && searchTerm.value !== null) {
+      const busqueda = searchTerm.value;
+      const filtered = data.filter((row) =>
+        (row.nombre && row.nombre.toLowerCase().includes(busqueda.toLowerCase())) ||
+        (row.codigo && String(row.codigo).toLowerCase().includes(busqueda.toLowerCase()))
+      );
+      setFilteredData(filtered);
     } else {
       setFilteredData(data);
     }
-  }, [data, searchTerm]);
-
-
+  }, [searchTerm, data]);
 
   const columns = [
     { name: 'Producto', selector: (row) => row.nombre, sortable: true },
     { name: 'Cantidad', selector: (row) => row.cantidad, sortable: true },
-    { name: 'Código', selector: (row) => row.codigo, sortable:true},
+    { name: 'Código', selector: (row) => row.codigo, sortable: true },
     { name: 'Precio', selector: (row) => row.precio, sortable: true },
-    { name: 'Cantidad Mínima', selector: (row) => row.cantidad_minima, sortable: true},
+    { name: 'Cantidad Mínima', selector: (row) => row.cantidad_minima, sortable: true },
     {
       name: '',
       cell: (row) => (
-        <div> 
-          <img src={delIcon} alt="Delete" onClick={() => handleDelete(row.codigo)} />
-          <img src={modIcon} onClick={() => handleModify(row.codigo)}
-          style={{ width: '50%', height: '40%', marginBottom: '10%', marginLeft: '12%'}} />        
+        <div style={{ display: 'flex', alignItems: 'center', gap: '10px', height: '100%' }}>
+          {/* Botón de Eliminar (X) */}
+          <button
+            onClick={() => handleDelete(row.codigo)}
+            style={{
+              color: 'red',
+              background: 'none',
+              border: 'none',
+              cursor: 'pointer',
+              fontSize: '3.8em',
+              fontWeight: 'bold',
+              padding: '0',
+              lineHeight: '1'
+            }}
+            title="Eliminar"
+          >
+            {'\u00D7'}
+          </button>
+          
+          {/* Mantenemos el icono de modificar */}
+          <img
+            src={modIcon}
+            onClick={() => handleModify(row.codigo)}
+            style={{ width: '24px', height: '24px', cursor: 'pointer' }}
+            alt="Modificar"
+            title="Modificar"
+          />
         </div>
       ),
       ignoreRowClick: true,
@@ -109,30 +137,31 @@ function DataTableComponent({searchTerm}) {
 
   return (
     <>
-    <DataTable
-      columns={columns}
-      data={filteredData && filteredData.length >= 0 ? filteredData : data} 
-      noDataComponent="Producto no disponible"
-      defaultSortFieldId={1}
-      pagination
-      responsive
-      aginationPerPage={5}
-      fixedHeader
-      fixedHeaderScrollHeight="50%"
-      customStyles={customStyles}
-      paginationRowsPerPageOptions={[5, 10, 15, 20, 25, 30]}
-    />
+      <DataTable
+        columns={columns}
+        data={filteredData && filteredData.length >= 0 ? filteredData : data}
+        noDataComponent="Producto no disponible"
+        defaultSortFieldId={1}
+        pagination
+        responsive
+        paginationPerPage={5} // Corregido el typo 'aginationPerPage'
+        fixedHeader
+        fixedHeaderScrollHeight="50%"
+        customStyles={customStyles}
+        paginationRowsPerPageOptions={[5, 10, 15, 20, 25, 30]}
+        
+        // --- APLICAMOS LA NUEVA FUNCIONALIDAD ---
+        conditionalRowStyles={conditionalRowStyles}
+      />
 
-    {openModal && <ModificacionProductosModal closeModal={() => setOpenModal(false)} codigo={selectedCodigo}/>}
-    {openModalDelete && <EliminarModal closeModal={() => setOpenModalDelete(false)} codigo={selectedCodigo}/>}
-
+      {openModal && <ModificacionProductosModal closeModal={() => setOpenModal(false)} codigo={selectedCodigo} />}
+      {openModalDelete && <EliminarModal closeModal={() => setOpenModalDelete(false)} codigo={selectedCodigo} />}
     </>
   );
-  
 }
 
 DataTableComponent.propTypes = {
-  searchTerm: PropTypes.string.isRequired,
+  searchTerm: PropTypes.object,
 };
 
 export default DataTableComponent;

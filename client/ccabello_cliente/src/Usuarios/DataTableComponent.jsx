@@ -1,7 +1,8 @@
 import  { useState, useEffect } from 'react';
 import DataTable from 'react-data-table-component';
 import axios from 'axios';
-import delIcon from '../assets/inventario/-.svg'
+// --- MODIFICACIÓN: Ya no necesitamos el delIcon ---
+// import delIcon from '../assets/inventario/-.svg' 
 import modIcon from '../assets/inventario/modIcon.svg'
 import showIcon from '../assets/usuarios/mostrar.svg'
 import hideIcon from '../assets/usuarios/esconder.svg'
@@ -31,7 +32,7 @@ function DataTableComponent() {
   const handleDelete = async (codigo) => {
     setSelectedUsuario(codigo);
     setOpenModalDelete(true);
-    {openModal && <EliminarModal closeModal={setOpenModal} codigo={selectedUsuario}/>}
+    // {openModal && <EliminarModal closeModal={setOpenModal} codigo={selectedUsuario}/>}
   };
 
 
@@ -39,37 +40,35 @@ function DataTableComponent() {
   const handleModify = async (usuario) => {
     setSelectedUsuario(usuario);
     setOpenModal(true);
-    {openModal && <ModificacionUsuariosModal closeModal={setOpenModal} usuario={selectedUsuario}/>}
+    // {openModal && <ModificacionUsuariosModal closeModal={setOpenModal} codigo={selectedUsuario}/>}
   };
 
-
   useEffect(() => {
-    async function fetchData() {
+    const fetchData = async () => {
       try {
         const response = await axios.get('http://localhost:8080/data_usuarios');
         setData(response.data);
-        setLoading(false);
-      } catch (err) {
-        setError(err);
+      } catch (error) {
+        setError(error);
+      } finally {
         setLoading(false);
       }
-    }
+    };
     fetchData();
   }, []);
 
-  const togglePassword = (usuario) => {
-    setVisiblePasswords((prev) => ({
-      ...prev,
-      [usuario]: !prev[usuario],
+  const togglePassword = (userId) => {
+    setVisiblePasswords(prevState => ({
+      ...prevState,
+      [userId]: !prevState[userId]
     }));
   };
 
-
   const columns = [
     { name: 'Usuario', selector: (row) => row.usuario, sortable: true },
-    { name: 'Nombre', selector: (row) => `${row.nombre}  ${row.apellido_paterno} ${row.apellido_materno}`, sortable: true },
+    { name: 'Nombre', selector: (row) => row.nombre, sortable: true },
+    { name: 'Apellidos', selector: (row) => `${row.apellido_paterno} ${row.apellido_materno}`, sortable: true },
     { name: 'Rol', selector: (row) => row.rol, sortable: true },
-    // eslint-disable-next-line no-unused-vars
     {
       name: 'Contraseña',
       selector: (row) => (
@@ -81,14 +80,45 @@ function DataTableComponent() {
     {
       name: '',
       cell: (row) => (
-        <div> 
-          <img src={visiblePasswords[row.usuario] ? hideIcon : showIcon} alt="Delete" onClick={() => togglePassword(row.usuario)}
-          style={{ marginBottom: '6%', marginRight: '3%'}}
+        // --- INICIO DE LA MODIFICACIÓN ---
+        <div style={{ display: 'flex', alignItems: 'center', gap: '10px', height: '100%' }}>
+          {/* Botón de Mostrar/Ocultar contraseña */}
+          <img 
+            src={visiblePasswords[row.usuario] ? hideIcon : showIcon} 
+            alt="Toggle Password" 
+            onClick={() => togglePassword(row.usuario)}
+            style={{ cursor: 'pointer', width: '24px', height: '24px' }}
+            title="Mostrar/Ocultar"
           />
-          <img src={delIcon} alt="Delete" onClick={() => handleDelete(row.usuario)} />
-          <img src={modIcon} onClick={() => handleModify(row.usuario) }
-          style={{ width: '30%', height: '40%', marginBottom: '10%', marginLeft: '8%'}} />        
+
+          {/* Botón de Modificar */}
+          <img 
+            src={modIcon} 
+            onClick={() => handleModify(row.usuario) }
+            style={{ width: '24px', height: '24px', cursor: 'pointer'}} 
+            alt="Modificar"
+            title="Modificar"
+          />
+
+          {/* Reemplazamos el <img> por un <button> con una 'X' */}
+          <button 
+            onClick={() => handleDelete(row.usuario)}
+            style={{
+              color: 'red',
+              background: 'none',
+              border: 'none',
+              cursor: 'pointer',
+              fontSize: '3.8em', // Hacemos la 'X' más grande
+              fontWeight: 'bold',
+              padding: '0',
+              lineHeight: '1'
+            }}
+            title="Eliminar"
+          >
+            {'\u00D7'}
+          </button>
         </div>
+        // --- FIN DE LA MODIFICACIÓN ---
       ),
       ignoreRowClick: true,
     },
@@ -106,7 +136,7 @@ function DataTableComponent() {
       defaultSortFieldId={1}
       pagination
       responsive
-      aginationPerPage={5}
+      paginationPerPage={5} // Corregido el typo 'aginationPerPage'
       fixedHeader
       fixedHeaderScrollHeight="50%"
       customStyles={customStyles}
@@ -114,11 +144,9 @@ function DataTableComponent() {
     />
 
     {openModal && <ModificacionUsuariosModal closeModal={() => setOpenModal(false)} usuario={selectedUsuario}/>}
-    {openModalDelete && <EliminarModal closeModal={() => setOpenModalDelete(false)} usuario={selectedUsuario}/>}
-
+    {openModalDelete && <EliminarModal closeModal={() => setOpenModalDelete(false)} codigo={selectedUsuario}/>}
     </>
   );
-  
 }
 
 export default DataTableComponent;

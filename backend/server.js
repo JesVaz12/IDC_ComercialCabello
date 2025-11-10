@@ -43,593 +43,993 @@ db.connect((err) => {
 });
 
 // ... (El resto de tu código de rutas, app.listen, etc., va aquí) ...
+
+// --- INICIO DE CÓDIGO AÑADIDO ---
+
+/**
+ * Genera un código numérico aleatorio de 8 dígitos.
+ * Se genera como string para preservar ceros a la izquierda si fuera necesario.
+ */
+function generateRandomCode() {
+  const chars = '0123456789';
+  let result = '';
+  for (let i = 0; i < 8; i++) {
+    result += chars.charAt(Math.floor(Math.random() * chars.length));
+  }
+  return result;
+}
+
+// Endpoint para generar un código de producto único
+app.get('/api/productos/generar-codigo', (req, res) => {
+  function findUniqueCode() {
+    const uniqueCode = generateRandomCode();
+    
+    const sql = "SELECT COUNT(*) AS count FROM productos WHERE codigo = ?";
+    
+    db.query(sql, [uniqueCode], (err, result) => {
+      if (err) {
+        console.error("Error al verificar el código:", err);
+        return res.status(500).json({ Error: "Error interno del servidor" });
+      }
+
+      if (result[0].count === 0) {
+        // ¡El código es único! Envíalo de vuelta.
+        return res.json({ codigo: uniqueCode });
+      } else {
+        // El código ya existe, intenta de nuevo.
+        findUniqueCode();
+      }
+    });
+  }
+
+  findUniqueCode();
+});
+
+// --- FIN DE CÓDIGO AÑADIDO ---
+
+
 app.post('/register_user', (req, res) => {
+// ... (código existente)
+// ... (código existente)
     const sql = "INSERT INTO Trabajadores(`nombre`,`apellido_paterno`,`apellido_materno`,`usuario`,`contrasena`,`rol`) VALUES (?)";
     const sql_select = "SELECT * from Trabajadores where usuario=?";
     const sql_password = "INSERT INTO contrasenas(`encriptada`,`texto_plano`) VALUES (?,?)";
-    const values = [req.body.usuario.toLowerCase()];
+// ... (código existente)
+// ... (código existente)
     db.query(sql_select, values, (err, data) => {
         if(err) return res.json({Error: "Error al buscar el usuario"});
         if(data.length>0){
-            return res.json({Error: "El USUARIO ya está REGISTRADO"})
+// ... (código existente)
+// ... (código existente)
         }
         bcrypt.hash(req.body.contrasena, salt, (err, hash) => {
             if(err)return res.json({Error: "Error al encriptar la contraseña"});
+// ... (código existente)
+// ... (código existente)
             const values = [req.body.nombre.toLowerCase().replace(/(^|\s)\S/gu, c => c.toUpperCase()),
                 req.body.apellido_paterno.toLowerCase().replace(/(^|\s)\S/gu, c => c.toUpperCase()),
                 req.body.apellido_materno.toLowerCase().replace(/(^|\s)\S/gu, c => c.toUpperCase()),
+// ... (código existente)
+// ... (código existente)
                 req.body.usuario.toLowerCase(), hash, req.body.rol];
             db.query(sql, [values], (err, result) => {
                 if(err) return res.json({Error: "Error al registrar el usuario"});
+// ... (código existente)
+// ... (código existente)
                 db.query(sql_password, [hash, req.body.contrasena], (err, result) => {
                     if(err) return res.json({Error: "Error al registrar la contraseña"});
                     if(result.affectedRows > 0){
+// ... (código existente)
+// ... (código existente)
                         return res.status(200).json({ message: 'Usuario registrado exitosamente' });
                     }else{
                         console.log(err);
+// ... (código existente)
+// ... (código existente)
                     }
                 })
             })
         })
+// ... (código existente)
+// ... (código existente)
     }
     )
 })
-
-
+// ... (código existente)
+// ... (código existente)
 app.post('/update_user', (req, res) => {
     const sql = "UPDATE Trabajadores SET nombre=?, apellido_paterno=?, apellido_materno=?, contrasena=?, rol=? WHERE usuario=?";
+// ... (código existente)
+// ... (código existente)
     const password_replace = "UPDATE  contrasenas SET encriptada=?, texto_plano=? WHERE encriptada=(SELECT contrasena from Trabajadores WHERE usuario=?)";
     bcrypt.hash(req.body.contrasena, salt, (err, hash) => {
         if(err)return res.json({Error: "Error al encriptar la contraseña"});
+// ... (código existente)
+// ... (código existente)
         const values = [req.body.nombre.toLowerCase().replace(/(^|\s)\S/gu, c => c.toUpperCase()),
             req.body.apellido_paterno.toLowerCase().replace(/(^|\s)\S/gu, c => c.toUpperCase()),
             req.body.apellido_materno.toLowerCase().replace(/(^|\s)\S/gu, c => c.toUpperCase()),
+// ... (código existente)
+// ... (código existente)
             hash,req.body.rol, req.body.usuario];
         db.query(password_replace,[hash,req.body.contrasena,req.body.usuario] , (err, result) => {
+// ... (código existente)
+// ... (código existente)
             if (err) {
                 console.error("Database error:", err);
                 return res.status(500).json({ Error: "Error updating user data" });
+// ... (código existente)
+// ... (código existente)
             }
             db.query(sql, values, (err, result) => {
                 if (err) {
+// ... (código existente)
+// ... (código existente)
                     console.error("Database error:", err);
                     return res.status(500).json({ Error: "Error updating password" });
                 }
+// ... (código existente)
+// ... (código existente)
                 if (result.affectedRows > 0) {
                     return res.status(200).json({ message: 'User updated successfully' });
                 } else {
+// ... (código existente)
+// ... (código existente)
                     console.log("No user updated");
                 }
             });
+// ... (código existente)
+// ... (código existente)
         });
         })
  });
-
+// ... (código existente)
+// ... (código existente)
 app.post('/login', (req, res) => {
     try {
         console.log("PISTA 1: Entrando en la ruta /login.");
+// ... (código existente)
+// ... (código existente)
         const username = req.body.username;
         const password = req.body.password;
 
         if (!username || !password) {
+// ... (código existente)
+// ... (código existente)
             console.log("ERROR: Usuario o contraseña no recibidos en la petición.");
             return res.status(400).json({ Error: "Falta usuario o contraseña." });
         }
-
+// ... (código existente)
+// ... (código existente)
         console.log(`PISTA 2: Buscando usuario '${username}' en la base de datos.`);
         const sql = "SELECT * FROM Trabajadores WHERE usuario = ?";
 
         db.query(sql, [username], (err, data) => {
+// ... (código existente)
+// ... (código existente)
             if (err) {
                 console.error("PISTA 3: ERROR de base de datos.", err);
                 return res.status(500).json({ Error: "Error en la consulta de la base de datos." });
+// ... (código existente)
+// ... (código existente)
             }
 
             if (data.length === 0) {
+// ... (código existente)
+// ... (código existente)
                 console.log("PISTA 4: Usuario no encontrado en la base de datos.");
                 return res.json({ Error: "Usuario no registrado" });
             }
-
+// ... (código existente)
+// ... (código existente)
             console.log("PISTA 5: Usuario encontrado. Procediendo a comparar contraseñas.");
             const user = data[0];
 
             bcrypt.compare(password.toString(), user.contrasena, (bcryptErr, response) => {
+// ... (código existente)
+// ... (código existente)
                 if (bcryptErr) {
                     console.error("PISTA 6: ERROR en la función bcrypt.compare.", bcryptErr);
                     return res.status(500).json({ Error: "Error en el servidor al verificar contraseña." });
+// ... (código existente)
+// ... (código existente)
                 }
 
                 if (response) {
+// ... (código existente)
+// ... (código existente)
                     console.log("PISTA 7: Contraseña CORRECTA. Login exitoso.");
                     const name = user.usuario;
                     const token = jwt.sign({ name }, "jwt-secret-key", { expiresIn: '1d' });
+// ... (código existente)
+// ... (código existente)
                     res.cookie('token', token);
                     return res.json({ Status: "Exito" });
                 } else {
+// ... (código existente)
+// ... (código existente)
                     console.log("PISTA 8: Contraseña INCORRECTA.");
                     return res.json({ Error: "Contraseña incorrecta" });
                 }
+// ... (código existente)
+// ... (código existente)
             });
         });
     } catch (e) {
+// ... (código existente)
+// ... (código existente)
         console.error("PISTA 9: ¡ERROR CATASTRÓFICO ATRAPADO!", e);
         res.status(500).json({ Error: "Un error inesperado ocurrió en el servidor." });
     }
+// ... (código existente)
+// ... (código existente)
 });
 
 app.post('/insertarProducto',(req, res) => {
+// ... (código existente)
+// ... (código existente)
     const sql = "INSERT INTO productos(codigo,nombre,precio,cantidad,cantidad_minima) VALUES(?,?,?,?,?)";
     const sql_select_codigo = "SELECT * from productos where codigo=?";
     const sql_select_nombre = "SELECT * from productos where nombre=?";
-
+// ... (código existente)
+// ... (código existente)
     const num_values = [Number(req.body.codigo), Number(req.body.cantidad), Number(req.body.cantidad_minima), Number(req.body.precio)];
     const values = [req.body.codigo,req.body.nombre.toLowerCase().replace(/\b\w/g, char => char.toUpperCase()),req.body.precio,req.body.cantidad, req.body.cantidad_minima];
     db.query(sql_select_codigo, [req.body.codigo], (err,data) => {
+// ... (código existente)
+// ... (código existente)
         console.log(data.sql);
         if(data.length>0){
             return res.json({Error: "El CÓDIGO del producto YA está REGISTRADO"})
+// ... (código existente)
+// ... (código existente)
         }else{
             db.query(sql_select_nombre, [req.body.nombre], (err, data) => {
                 if(data.length>0){
+// ... (código existente)
+// ... (código existente)
                     console.log(data.sql);
                     return res.json({Error: "El NOMBRE del producto YA está REGISTRADO"});
                 }else{
+// ... (código existente)
+// ... (código existente)
                     if(Number.isInteger(num_values[0]) && Number.isInteger(num_values[1]) && Number.isInteger(num_values[2])){
                         db.query(sql, values, (err,data) => {
                             if(err) return res.json({Error: "Ha habido un error al insertar el producto"});
+// ... (código existente)
+// ... (código existente)
                             return res.json({Status: "Exito"});
                         })
                     }else{
+// ... (código existente)
+// ... (código existente)
                         return res.json({Error: "Por favor, ingrese cantidades ENTERAS"});
                     }
                 }
+// ... (código existente)
+// ... (código existente)
             })
         }
     })
+// ... (código existente)
+// ... (código existente)
 })
 
 app.post('/modificarProducto',(req, res) => {
+// ... (código existente)
+// ... (código existente)
     const sql =" UPDATE productos set nombre=?, precio = ? , cantidad = ? , cantidad_minima = ? WHERE codigo = ?";
     const sql_select_codigo = "SELECT * from productos where codigo=?";
     const sql_select_nombre = "SELECT * from productos where nombre=?";
+// ... (código existente)
+// ... (código existente)
     const num_values = [Number(req.body.codigo), Number(req.body.cantidad), Number(req.body.cantidad_minima), Number(req.body.precio)];
     const values = [req.body.nombre.toLowerCase().replace(/\b\w/g, char => char.toUpperCase()),req.body.precio,req.body.cantidad, req.body.cantidad_minima, req.body.codigo];
     db.query(sql_select_codigo, [req.body.codigo], (err,data) => {
+// ... (código existente)
+// ... (código existente)
         console.log(data.sql);
         if(data.length>1){
             return res.json({Error: "El CÓDIGO del producto YA está REGISTRADO"})
+// ... (código existente)
+// ... (código existente)
         }else{
             const nombre_original = data[0].nombre;
             db.query(sql_select_nombre, [req.body.nombre], (err, data) => {
+// ... (código existente)
+// ... (código existente)
                 if(data.length>0 && nombre_original != req.body.nombre){
                     console.log(data.sql);
                     return res.json({Error: "El NOMBRE del producto YA está REGISTRADO"});
+// ... (código existente)
+// ... (código existente)
                 }else{
                     if(Number.isInteger(num_values[0]) && Number.isInteger(num_values[1]) && Number.isInteger(num_values[2])){
+// ... (código existente)
+// ... (código existente)
                         db.query(sql, values, (err,data) => {
                             if(err) return res.json({Error: "Ha habido un error al insertar el producto"});
                             return res.json({Status: "Exito"});
+// ... (código existente)
+// ... (código existente)
                         })
                     }else{
                         return res.json({Error: "Por favor, ingrese cantidades ENTERAS"});
+// ... (código existente)
+// ... (código existente)
                     }
                 }
             })
+// ... (código existente)
+// ... (código existente)
         }
     })
 })
-
+// ... (código existente)
+// ... (código existente)
 
 const verifyUser = (req, res, next) => {
     const token = req.cookies.token;
+// ... (código existente)
+// ... (código existente)
     if(!token){
         return res.json({Error: "No estás autenticado"});
     }else{
+// ... (código existente)
+// ... (código existente)
         jwt.verify(token, "jwt-secret-key", (err, decoded) => {
             if(err) return res.json({Error: "Token inválido"});
             req.name = decoded.name;
+// ... (código existente)
+// ... (código existente)
             const sql_select = "SELECT * from Trabajadores where usuario=?";
             db.query(sql_select, [req.name], (err, data) => {
                 if(err) return res.json({Error: "Error al buscar el usuario"});
+// ... (código existente)
+// ... (código existente)
                 if(data.length>0){
                     req.rol = data[0].rol;
                     next();
+// ... (código existente)
+// ... (código existente)
                 }else{
                     return res.json({Error: "Usuario no registrado"});
                 }
+// ... (código existente)
+// ... (código existente)
             })
         })
     }
+// ... (código existente)
+// ... (código existente)
 }
 
 app.get('/', verifyUser, (req, res) => {
+// ... (código existente)
+// ... (código existente)
     return res.json({Status: "Exito", name: req.name, rol: req.rol});
 })
 
-
+// ... (código existente)
+// ... (código existente)
 app.get('/logout', (req, res) => {
     res.clearCookie('token');
     return res.json({Status: "Exito"});
+// ... (código existente)
+// ... (código existente)
 })
 
 app.get('/data', (req, res) => {
+// ... (código existente)
+// ... (código existente)
     db.query('SELECT * FROM productos', (error, results, fields) => {
       if (error) {
         console.error('Database query error:', error);
+// ... (código existente)
+// ... (código existente)
         res.status(500).json({ error: 'Internal Server Error' });
         return;
       }
+// ... (código existente)
+// ... (código existente)
       res.json(results);
     });
   });
-
+// ... (código existente)
+// ... (código existente)
   app.get('/dataPventa', (req, res) => {
     db.query('SELECT * FROM productos WHERE cantidad > 0', (error, results, fields) => {
       if (error) {
+// ... (código existente)
+// ... (código existente)
         console.error('Database query error:', error);
         res.status(500).json({ error: 'Internal Server Error' });
         return;
+// ... (código existente)
+// ... (código existente)
       }
       res.json(results);
     });
+// ... (código existente)
+// ... (código existente)
   });
 
   app.get('/dataFaltantes', (req, res) => {
+// ... (código existente)
+// ... (código existente)
     const sql = 'SELECT * FROM productos WHERE cantidad < cantidad_minima';
     db.query(sql, (error, results, fields) => {
       if (error) {
+// ... (código existente)
+// ... (código existente)
         console.error('Database query error:', error);
         res.status(500).json({ error: 'Internal Server Error' });
         return;
+// ... (código existente)
+// ... (código existente)
       }
       res.json(results);
     });
+// ... (código existente)
+// ... (código existente)
   });
 
   app.get('/data_usuarios', (req, res) => {
+// ... (código existente)
+// ... (código existente)
     db.query('SELECT usuario, nombre, apellido_paterno, apellido_materno, rol, texto_plano, contrasena FROM Trabajadores,contrasenas WHERE encriptada=contrasena', (error, results, fields) => {
       if (error) {
         console.error('Database query error:', error);
+// ... (código existente)
+// ... (código existente)
         res.status(500).json({ error: 'Internal Server Error' });
         return;
       }
+// ... (código existente)
+// ... (código existente)
       res.json(results);
     });
   });
-
+// ... (código existente)
+// ... (código existente)
 app.get('/GetProducto/:codigo', (req, res) => {
     const codigo = req.params.codigo;
     const sql = 'SELECT * FROM productos WHERE codigo = ?';
+// ... (código existente)
+// ... (código existente)
 
     db.query(sql, [codigo], (err, result) => {
         if (err) {
+// ... (código existente)
+// ... (código existente)
             return res.status(500).json({ Error: "Error al buscar el producto" });
         }
         if (result.length > 0) {
+// ... (código existente)
+// ... (código existente)
             return res.status(200).json({ Status: "Exito", Producto: result[0] });
         } else {
             res.status(404).json({ error: 'No se encontró el producto' });
+// ... (código existente)
+// ... (código existente)
         }
     });
 });
-
+// ... (código existente)
+// ... (código existente)
   app.delete('/deleteProducto/:codigo', (req, res) => {
     const codigo = req.params.codigo;
     const sql = 'DELETE FROM productos WHERE codigo = ?';
+// ... (código existente)
+// ... (código existente)
 
     db.query(sql, [codigo], (err, result) => {
         if (err) {
+// ... (código existente)
+// ... (código existente)
             return res.status(500).json({ Error: "Error al eliminar el producto" });
         }
         if (result.affectedRows > 0) {
+// ... (código existente)
+// ... (código existente)
             res.status(200).json({ message: 'Se eliminó el producto éxitosamente' });
         } else {
             res.status(404).json({ error: 'No se encontró el producto' });
+// ... (código existente)
+// ... (código existente)
         }
     });
 });
-
+// ... (código existente)
+// ... (código existente)
 app.delete('/deleteUsuario/:usuario', (req, res) => {
     const usuario = req.params.usuario;
     const sql = 'DELETE FROM Trabajadores WHERE usuario = ?';
+// ... (código existente)
+// ... (código existente)
 
     db.query(sql, [usuario], (err, result) => {
         if (err) {
+// ... (código existente)
+// ... (código existente)
             return res.status(500).json({ Error: "Error al eliminar el usuario" });
         }
         if (result.affectedRows > 0) {
+// ... (código existente)
+// ... (código existente)
             res.json({ message: 'Se eliminó el usuario éxitosamente' });
         } else {
             res.status(404).json({ error: 'No se encontró el usuario' });
+// ... (código existente)
+// ... (código existente)
         }
     });
 });
-
+// ... (código existente)
+// ... (código existente)
 app.get('/GetUser', (req, res) => {
     const token = req.cookies.token;
 
+// ... (código existente)
+// ... (código existente)
     if (!token) {
         return res.status(401).json({ Error: "No token provided" });
     }
+// ... (código existente)
+// ... (código existente)
 
     try {
         const tokenDecoded = JSON.parse(Buffer.from(token.split('.')[1], 'base64').toString());
+// ... (código existente)
+// ... (código existente)
         const username = tokenDecoded.name;
 
         if (!username) {
+// ... (código existente)
+// ... (código existente)
           return res.status(400).json({ Error: "Username not found in token" });
         }
 
+// ... (código existente)
+// ... (código existente)
         const sql = 'SELECT usuario, nombre, apellido_paterno, rol FROM Trabajadores WHERE usuario = ?';
 
         db.query(sql, [username], (err, results) => {
+// ... (código existente)
+// ... (código existente)
             if (err) {
                 console.error("Database error:", err);
                 return res.status(500).json({ Error: "Error fetching user data" });
+// ... (código existente)
+// ... (código existente)
             }
 
             if (results.length === 0) {
+// ... (código existente)
+// ... (código existente)
                 return res.status(404).json({ Error: "User not found" });
             }
 
             const user = results[0];
+// ... (código existente)
+// ... (código existente)
             const fullName = user.nombre.split(" ");
             const firstName = fullName[0];
             const lastName = user.apellido_paterno;
+// ... (código existente)
+// ... (código existente)
             const name = firstName + " " + lastName;
             const rol = user.rol;
             const username = user.usuario;
+// ... (código existente)
+// ... (código existente)
             return res.json({ name,rol, username});
         });
 
     } catch (error) {
+// ... (código existente)
+// ... (código existente)
         console.error("Token decoding error:", error);
         return res.status(400).json({ Error: "Invalid token format" });
     }
+// ... (código existente)
+// ... (código existente)
 })
 
 app.get('/GetUserData/:user', (req, res) => {
+// ... (código existente)
+// ... (código existente)
     const usuario_completo = req.params.user;
     const sql = 'SELECT * from Trabajadores, contrasenas WHERE contrasena=encriptada AND usuario = ?';
 
     db.query(sql, [usuario_completo], (err, results) => {
+// ... (código existente)
+// ... (código existente)
         if (err) {
             console.error("Database error:", err);
             return res.status(500).json({ Error: "Error fetching user data" });
+// ... (código existente)
+// ... (código existente)
         }
 
         if (results.length === 0) {
+// ... (código existente)
+// ... (código existente)
             return res.status(404).json({ Error: "User not found" });
         }
         return res.status(200).json(results[0]);
+// ... (código existente)
+// ... (código existente)
     });
 })
 
-
+// ... (código existente)
+// ... (código existente)
 
 app.listen(8080, () => {
     console.log('Conectado al backend!');
+// ... (código existente)
+// ... (código existente)
 })
 
 app.get('/generar-pdf', (req, res) => {
+// ... (código existente)
+// ... (código existente)
     const fonts = {
         Roboto: {
             normal: 'fonts/JosefinSans-Regular.ttf',
+// ... (código existente)
+// ... (código existente)
             bold: 'fonts/JosefinSans-Medium.ttf',
             italics: 'fonts/JosefinSans-Italic.ttf',
             bolditalics: 'fonts/JosefinSans-MediumItalic.ttf'
+// ... (código existente)
+// ... (código existente)
         }
     };
     const body = [['Producto', 'Cantidad', 'Código', 'Precio', 'Cantidad Mínima']];
+// ... (código existente)
+// ... (código existente)
     db.query('SELECT * FROM productos WHERE cantidad < cantidad_minima ', (error, results, fields) => {
         if (error) {
           console.error('Database query error:', error);
+// ... (código existente)
+// ... (código existente)
           res.status(500).json({ error: 'Internal Server Error' });
           return;
         }
+// ... (código existente)
+// ... (código existente)
         results.forEach(row => {
             body.push([
                 row.nombre,
+// ... (código existente)
+// ... (código existente)
                 row.cantidad.toString(),
                 row.codigo,
                 `$${row.precio}`,
+// ... (código existente)
+// ... (código existente)
                 row.cantidad_minima.toString()
             ]);
         });
+// ... (código existente)
+// ... (código existente)
         var dd = {
             content: [
                 {
+// ... (código existente)
+// ... (código existente)
                     image: './img/faltantes_header.png',
                     width: 530,
                     margin: [0, 0, 0, 20] //
+// ... (código existente)
+// ... (código existente)
                 },
                 {text: 'Lista de Faltantes', style: 'header', alignment: 'center', margin: [0, 0, 0, 40]},
                 {
+// ... (código existente)
+// ... (código existente)
                     style: 'tableExample',
                     table: {
                         widths: [95, 95, 95, 95,95],
+// ... (código existente)
+// ... (código existente)
                         body
                     }
                 }
+// ... (código existente)
+// ... (código existente)
             ],
             styles: {
                 header: {
+// ... (código existente)
+// ... (código existente)
                     fontSize: 18,
                     bold: true
                 },
+// ... (código existente)
+// ... (código existente)
                 subheader: {
                     fontSize: 14,
                     bold: true
+// ... (código existente)
+// ... (código existente)
                 },
                 tableExample: {
                     margin: [0, 5, 0, 15]
+// ... (código existente)
+// ... (código existente)
                 }
             }
         };
+// ... (código existente)
+// ... (código existente)
         var printer = new PdfPrinter(fonts);
         var pdfDoc = printer.createPdfKitDocument(dd);
         pdfDoc.pipe(fs.createWriteStream('lista_de_faltantes.pdf')).on('finish', () => {
+// ... (código existente)
+// ... (código existente)
             res.download('lista_de_faltantes.pdf', 'lista_de_faltantes.pdf', (err) => {
                 if (err) {
                     console.error('Error downloading the file:', err);
+// ... (código existente)
+// ... (código existente)
                 }
             });
         });
+// ... (código existente)
+// ... (código existente)
         pdfDoc.end();
         console.log('PDF generated and ready for download');
       });
+// ... (código existente)
+// ... (código existente)
 })
 
 app.delete('/deleteUser/:usuario', (req, res) => {
+// ... (código existente)
+// ... (código existente)
     const codigo = req.params.usuario;
     const sql = 'DELETE FROM Trabajadores WHERE usuario = ?';
 
     db.query(sql, [codigo], (err, result) => {
+// ... (código existente)
+// ... (código existente)
         if (err) {
             return res.status(500).json({ Error: "Error al eliminar el usuario" });
         }
+// ... (código existente)
+// ... (código existente)
         if (result.affectedRows > 0) {
             res.status(200).json({ message: 'Se eliminó el usuario éxitosamente' });
         } else {
+// ... (código existente)
+// ... (código existente)
             res.status(404).json({ error: 'No se encontró el usuario' });
         }
     });
+// ... (código existente)
+// ... (código existente)
 });
 
 app.post('/realizarCobro', async (req, res) => {
+// ... (código existente)
+// ... (código existente)
     try {
         const [ventaResult] = await db.promise().query("SELECT MAX(num_venta) FROM ventas;");
         let num_venta = ventaResult[0]["MAX(num_venta)"] ? parseInt(ventaResult[0]["MAX(num_venta)"]) + 1 : 1;
+// ... (código existente)
+// ... (código existente)
 
         const [fechaResult] = await db.promise().query("SELECT CURDATE()");
         const fecha_query = fechaResult[0]['CURDATE()'];
         const fecha_obj = new Date(fecha_query);
+// ... (código existente)
+// ... (código existente)
         const fechaISO = fecha_obj.toISOString().slice(0, 10);
 
         let faltantes = [];
+// ... (código existente)
+// ... (código existente)
         let error = "";
 
         await Promise.all(req.body.data.map(async (producto) => {
+// ... (código existente)
+// ... (código existente)
             const [productResult] = await db.promise().query("SELECT * FROM productos WHERE codigo = ?", [producto.codigo]);
             if (productResult.length > 0) {
                 const cantidad_actual = productResult[0].cantidad;
+// ... (código existente)
+// ... (código existente)
                 const cantidad_minima = productResult[0].cantidad_minima;
                 if (cantidad_actual - producto.cantidad >= 0) {
                     const sql_insert = "INSERT INTO ventas(num_venta, producto, cantidad, total, fecha, usuario) VALUES(?,?,?,?,?,?)";
+// ... (código existente)
+// ... (código existente)
                     const valores = [num_venta, producto.codigo, producto.cantidad, req.body.costo, fechaISO, req.body.username];
                     await db.promise().query(sql_insert, valores);
 
                     const sql_update = "UPDATE productos SET cantidad = cantidad - ? WHERE codigo = ?";
+// ... (código existente)
+// ... (código existente)
                     await db.promise().query(sql_update, [producto.cantidad, producto.codigo]);
 
                     if (cantidad_actual - producto.cantidad < cantidad_minima) {
+// ... (código existente)
+// ... (código existente)
                         faltantes.push({
                             codigo: producto.codigo,
                             nombre: producto.nombre,
+// ... (código existente)
+// ... (código existente)
                             cantidad: cantidad_actual - producto.cantidad,
                         });
                     }
+// ... (código existente)
+// ... (código existente)
                 }else{
                     error = `Producto ${producto.nombre} sin existencias`;
                 }
+// ... (código existente)
+// ... (código existente)
             }else{
                 return res.status(404).json({ Error: `Producto con código ${producto.codigo} no encontrado` });
             }
+// ... (código existente)
+// ... (código existente)
         }));
         if (error) {
             return res.json({ Error: error });
+// ... (código existente)
+// ... (código existente)
         }else{
             console.log(faltantes)
             return res.status(200).json({
+// ... (código existente)
+// ... (código existente)
                 Status: "Exito",
                 message: "Venta realizada con éxito",
                 Faltantes: faltantes
+// ... (código existente)
+// ... (código existente)
             });
         }
     } catch (err) {
+// ... (código existente)
+// ... (código existente)
         console.log(err);
         return res.status(500).json({ Error: "Ocurrió un error en el proceso de venta" });
     }
+// ... (código existente)
+// ... (código existente)
 });
 
 
 app.get('/dataPventa', (req, res) => {
+// ... (código existente)
+// ... (código existente)
     db.query('SELECT * FROM productos WHERE cantidad>0', (error, results, fields) => {
       if (error) {
         console.error('Database query error:', error);
+// ... (código existente)
+// ... (código existente)
         res.status(500).json({ error: 'Internal Server Error' });
         return;
       }
+// ... (código existente)
+// ... (código existente)
       res.json(results);
     });
   });
-
+// ... (código existente)
+// ... (código existente)
   app.get('/dataPventa', (req, res) => {
     db.query('SELECT * FROM productos WHERE cantidad>0', (error, results, fields) => {
       if (error) {
+// ... (código existente)
+// ... (código existente)
         console.error('Database query error:', error);
         res.status(500).json({ error: 'Internal Server Error' });
         return;
+// ... (código existente)
+// ... (código existente)
       }
       res.json(results);
     });
+// ... (código existente)
+// ... (código existente)
   });
 
 
   app.post('/imprimir-ticket', (req, res) => {
+// ... (código existente)
+// ... (código existente)
     const fonts = {
         Roboto: {
             normal: path.join(__dirname, 'fonts', 'JosefinSans-Regular.ttf'),
+// ... (código existente)
+// ... (código existente)
             bold: path.join(__dirname, 'fonts', 'JosefinSans-Medium.ttf'),
             italics: path.join(__dirname, 'fonts', 'JosefinSans-Italic.ttf'),
             bolditalics: path.join(__dirname, 'fonts', 'JosefinSans-MediumItalic.ttf')
+// ... (código existente)
+// ... (código existente)
         }
     };
 
     const body = [['Producto', 'Cantidad', 'Precio', 'Subtotal']];
+// ... (código existente)
+// ... (código existente)
     req.body.data.forEach(row => {
         body.push([
             row.nombre,
+// ... (código existente)
+// ... (código existente)
             row.cantidad.toString(),
             `$${row.precio}`,
             `$${row.precio * row.cantidad}`,
+// ... (código existente)
+// ... (código existente)
         ]);
     });
 
     const dd = {
+// ... (código existente)
+// ... (código existente)
         content: [
             {
                 image: path.join(__dirname, 'img', 'faltantes_header.png'),
+// ... (código existente)
+// ... (código existente)
                 width: 530,
                 margin: [0, 0, 0, 20]
             },
+// ... (código existente)
+// ... (código existente)
             { text: 'Ticket de venta', style: 'header', alignment: 'center', margin: [0, 0, 0, 40] },
             {
                 style: 'tableExample',
+// ... (código existente)
+// ... (código existente)
                 table: {
                     widths: ['*', '*', '*', '*'],
                     body
+// ... (código existente)
+// ... (código existente)
                 }
             },
             { text: `Total: $${req.body.costo}`, style: 'header', alignment: 'center', margin: [0, 0, 0, 40] },
             { text: `Pagó: $${req.body.pago}`,style: 'header', alignment: 'center', margin: [0, 0, 0, 40] },
+// ... (código existente)
+// ... (código existente)
             { text: `Cambio: $${req.body.pago-req.body.costo}`, style: 'header', alignment: 'center', margin: [0, 0, 0, 40] },
         ],
         styles: {
+// ... (código existente)
+// ... (código existente)
             header: {
                 fontSize: 18,
                 bold: true
+// ... (código existente)
+// ... (código existente)
             },
             tableExample: {
                 margin: [0, 5, 0, 15]
+// ... (código existente)
+// ... (código existente)
             }
         }
     };
 
     const printer = new PdfPrinter(fonts);
+// ... (código existente)
+// ... (código existente)
     const pdfDoc = printer.createPdfKitDocument(dd);
 
     res.setHeader('Content-Type', 'application/pdf');
+// ... (código existente)
+// ... (código existente)
     res.setHeader('Content-Disposition', 'attachment; filename=ticket.pdf');
 
     pdfDoc.pipe(res);

@@ -13,15 +13,12 @@ body, html, #root {
   display: flex;
   flex-direction: column;
   margin-top: 0;
-
 }
 
 .horizontal_layout {
   width: 100%;
   height: 90%;
   display: flex;
-  margin-top: 0;
-  margin-bottom: 0;
   flex-direction: row;
   justify-content: center;
 }
@@ -31,7 +28,7 @@ body, html, #root {
   flex-direction: column;
   gap: 0px;
   width: 70%;
-  height: 90%; /* Ensure it takes full height */
+  height: 90%;
 }
 
 .ellipse {
@@ -39,19 +36,17 @@ body, html, #root {
   width: 80%;
   max-height: 105%;
   max-width: 100%;
-  width: auto;
   margin-bottom: 0;
 }
 
-.tienda{  
-  height:103%;
+.tienda {  
+  height: 103%;
   position: absolute;
   margin-top: 6%;
   z-index: 2;
-  position: absolute;
   top: 0;
   left: 0;
-  border-image-width:0;
+  border-image-width: 0;
 }
 
 .logo {
@@ -59,60 +54,68 @@ body, html, #root {
   margin-top: 7%;
 }
 
-.input{
-  margin-left: 20%;
+.login form {
+  display: flex;
+  flex-direction: column;
+  align-items: center; /* centra los campos horizontalmente */
+}
+
+/* ✅ Campos uniformes */
+.input {
+  display: block;
   background-color: white;
   border-radius: 30px;
-  border-bottom: 1px solid #9B1313;
-  border-bottom-width: 5px;
-  border-color: #9B1313;
+  border-bottom: 5px solid #9B1313;
   color: black;
   width: 60%;
+  max-width: 400px;
+  box-sizing: border-box;
   height: 10%;
   font-size: 200%;
   text-align: center;
+  margin: 10px 0;
 }
 
-.label{
+/* ✅ Etiquetas alineadas */
+.label {
   color: black;
   font-size: 180%;
-  margin-left: 20%;
-  margin-bottom: 0;
+  width: 60%;
+  max-width: 400px;
+  margin: 5px 0;
+  text-align: left;
   font-family: 'Josefin Sans', sans-serif;
   font-weight: 300;
 }
 
-.button{
+.button {
   background-color: #9B1313;
   border-radius: 50px;
   color: white;
   width: 25%;
   font-size: 150%;
-  margin-left: 38%;
   margin-top: 5%;
   font-family: 'Josefin Sans', sans-serif;
   font-weight: 700;
   margin-bottom: 0;
-  text-overflow:ellipsis;
+  text-overflow: ellipsis;
 }
 
-.button:hover{
+.button:hover {
   border-color: white;
   background-color: #9b1313ec;
-  color:white;
+  color: white;
 }
 
-.rectangle{
+.rectangle {
   background-color: #9B1313;
   height: 55%;
   width: 100%;
   margin-top: 0;
 }
 
-.tienda_logo{
+.tienda_logo {
   position: relative;
-  margin-left: 0;
-  position: left;
   max-width: 60%;
 }
 
@@ -122,7 +125,7 @@ error {
   translate: 0 -15vh;
   transition-property: display, opacity, translate;
   transition-duration: 0.5s;
-  transition-behavior: allow-discrete; /* Enables `display` transition */
+  transition-behavior: allow-discrete;
   margin-top: 2%;
   margin-bottom: 0;
 }
@@ -131,16 +134,13 @@ error[open] {
   display: block;
   opacity: 1;
   translate: 0 0;
-
   @starting-style {
     opacity: 0;
     translate: 0 -15vh;
   }
 }
 
-
-p{
+p {
   margin-top: 2%;
   margin-bottom: 0;
 }
-
