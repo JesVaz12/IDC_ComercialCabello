@@ -13,9 +13,9 @@ import { fileURLToPath } from 'url';
 
 const app = express();
 
-// --- CORRECCIÓN 1: Un solo bloque CORS para ambos ambientes ---
+// --- CONFIGURACIÓN CORS ---
 app.use(cors({
-    origin: ["http://localhost:8082", "http://localhost:5173"], // Permite staging y desarrollo
+    origin: ["http://localhost:8082", "http://localhost:5173"], 
     methods: ["POST", "GET", "PUT", "DELETE"],
     credentials: true
 }));
@@ -26,7 +26,7 @@ const __dirname = path.dirname(__filename);
 app.use(express.json());
 app.use(cookieParser());
 
-// --- CORRECCIÓN 2: Usar variables de entorno para la conexión ---
+// --- CONEXIÓN DB ---
 const db = mysql2.createConnection({
     host: process.env.DB_HOST,
     user: process.env.DB_USER,
@@ -38,11 +38,12 @@ db.connect((err) => {
     if (err) {
         console.error('Error connecting to the database: ' + err.stack);
         return;
-  }
+    }
     console.log('Connected to the database as ID ' + db.threadId);
 });
 
-// ... (El resto de tu código de rutas, app.listen, etc., va aquí) ...
+// --- RUTAS DE USUARIOS ---
+
 app.post('/register_user', (req, res) => {
     const sql = "INSERT INTO Trabajadores(`nombre`,`apellido_paterno`,`apellido_materno`,`usuario`,`contrasena`,`rol`) VALUES (?)";
     const sql_select = "SELECT * from Trabajadores where usuario=?";
@@ -71,10 +72,8 @@ app.post('/register_user', (req, res) => {
                 })
             })
         })
-    }
-    )
+    })
 })
-
 
 app.post('/update_user', (req, res) => {
     const sql = "UPDATE Trabajadores SET nombre=?, apellido_paterno=?, apellido_materno=?, contrasena=?, rol=? WHERE usuario=?";
@@ -102,85 +101,81 @@ app.post('/update_user', (req, res) => {
                 }
             });
         });
-        })
- });
+    })
+});
 
 app.post('/login', (req, res) => {
     try {
-        console.log("PISTA 1: Entrando en la ruta /login.");
         const username = req.body.username;
         const password = req.body.password;
 
         if (!username || !password) {
-            console.log("ERROR: Usuario o contraseña no recibidos en la petición.");
             return res.status(400).json({ Error: "Falta usuario o contraseña." });
         }
 
-        console.log(`PISTA 2: Buscando usuario '${username}' en la base de datos.`);
         const sql = "SELECT * FROM Trabajadores WHERE usuario = ?";
 
         db.query(sql, [username], (err, data) => {
             if (err) {
-                console.error("PISTA 3: ERROR de base de datos.", err);
                 return res.status(500).json({ Error: "Error en la consulta de la base de datos." });
             }
 
             if (data.length === 0) {
-                console.log("PISTA 4: Usuario no encontrado en la base de datos.");
                 return res.json({ Error: "Usuario no registrado" });
             }
 
-            console.log("PISTA 5: Usuario encontrado. Procediendo a comparar contraseñas.");
             const user = data[0];
 
             bcrypt.compare(password.toString(), user.contrasena, (bcryptErr, response) => {
                 if (bcryptErr) {
-                    console.error("PISTA 6: ERROR en la función bcrypt.compare.", bcryptErr);
                     return res.status(500).json({ Error: "Error en el servidor al verificar contraseña." });
                 }
 
                 if (response) {
-                    console.log("PISTA 7: Contraseña CORRECTA. Login exitoso.");
                     const name = user.usuario;
                     const token = jwt.sign({ name }, "jwt-secret-key", { expiresIn: '1d' });
                     res.cookie('token', token);
                     return res.json({ Status: "Exito" });
                 } else {
-                    console.log("PISTA 8: Contraseña INCORRECTA.");
                     return res.json({ Error: "Contraseña incorrecta" });
                 }
             });
         });
     } catch (e) {
-        console.error("PISTA 9: ¡ERROR CATASTRÓFICO ATRAPADO!", e);
+        console.error("Error catastrófico:", e);
         res.status(500).json({ Error: "Un error inesperado ocurrió en el servidor." });
     }
 });
 
-app.post('/insertarProducto',(req, res) => {
+// --- RUTAS DE PRODUCTOS ---
+
+// ✅ CORRECCIÓN APLICADA: Se eliminó la validación de entero para el código
+app.post('/insertarProducto', (req, res) => {
     const sql = "INSERT INTO productos(codigo,nombre,precio,cantidad,cantidad_minima) VALUES(?,?,?,?,?)";
     const sql_select_codigo = "SELECT * from productos where codigo=?";
     const sql_select_nombre = "SELECT * from productos where nombre=?";
 
-    const num_values = [Number(req.body.codigo), Number(req.body.cantidad), Number(req.body.cantidad_minima), Number(req.body.precio)];
-    const values = [req.body.codigo,req.body.nombre.toLowerCase().replace(/\b\w/g, char => char.toUpperCase()),req.body.precio,req.body.cantidad, req.body.cantidad_minima];
-    db.query(sql_select_codigo, [req.body.codigo], (err,data) => {
-        console.log(data.sql);
-        if(data.length>0){
-            return res.json({Error: "El CÓDIGO del producto YA está REGISTRADO"})
-        }else{
+    // SOLO validamos que CANTIDAD y MINIMA sean números. El código puede ser texto.
+    const num_values = [Number(req.body.cantidad), Number(req.body.cantidad_minima)];
+    
+    const values = [req.body.codigo, req.body.nombre.toLowerCase().replace(/\b\w/g, char => char.toUpperCase()), req.body.precio, req.body.cantidad, req.body.cantidad_minima];
+    
+    db.query(sql_select_codigo, [req.body.codigo], (err, data) => {
+        if (data.length > 0) {
+            return res.json({ Error: "El CÓDIGO del producto YA está REGISTRADO" })
+        } else {
             db.query(sql_select_nombre, [req.body.nombre], (err, data) => {
-                if(data.length>0){
-                    console.log(data.sql);
-                    return res.json({Error: "El NOMBRE del producto YA está REGISTRADO"});
-                }else{
-                    if(Number.isInteger(num_values[0]) && Number.isInteger(num_values[1]) && Number.isInteger(num_values[2])){
-                        db.query(sql, values, (err,data) => {
-                            if(err) return res.json({Error: "Ha habido un error al insertar el producto"});
-                            return res.json({Status: "Exito"});
+                if (data.length > 0) {
+                    return res.json({ Error: "El NOMBRE del producto YA está REGISTRADO" });
+                } else {
+                    // Verificamos solo las cantidades
+                    if (Number.isInteger(num_values[0]) && Number.isInteger(num_values[1])) {
+                        db.query(sql, values, (err, data) => {
+                            if (err) return res.json({ Error: "Ha habido un error al insertar el producto" });
+                            return res.json({ Status: "Exito" });
                         })
-                    }else{
-                        return res.json({Error: "Por favor, ingrese cantidades ENTERAS"});
+                    } else {
+                        return res.json({ Error: "Por favor, ingrese cantidades ENTERAS (Cantidad y Mínima)" });
                     }
                 }
             })
@@ -195,14 +190,12 @@ app.post('/modificarProducto',(req, res) => {
     const num_values = [Number(req.body.codigo), Number(req.body.cantidad), Number(req.body.cantidad_minima), Number(req.body.precio)];
     const values = [req.body.nombre.toLowerCase().replace(/\b\w/g, char => char.toUpperCase()),req.body.precio,req.body.cantidad, req.body.cantidad_minima, req.body.codigo];
     db.query(sql_select_codigo, [req.body.codigo], (err,data) => {
-        console.log(data.sql);
         if(data.length>1){
             return res.json({Error: "El CÓDIGO del producto YA está REGISTRADO"})
         }else{
             const nombre_original = data[0].nombre;
             db.query(sql_select_nombre, [req.body.nombre], (err, data) => {
                 if(data.length>0 && nombre_original != req.body.nombre){
-                    console.log(data.sql);
                     return res.json({Error: "El NOMBRE del producto YA está REGISTRADO"});
                 }else{
                     if(Number.isInteger(num_values[0]) && Number.isInteger(num_values[1]) && Number.isInteger(num_values[2])){
@@ -219,6 +212,7 @@ app.post('/modificarProducto',(req, res) => {
     })
 })
 
+// --- MIDDLEWARE ---
 
 const verifyUser = (req, res, next) => {
     const token = req.cookies.token;
@@ -246,7 +240,6 @@ app.get('/', verifyUser, (req, res) => {
     return res.json({Status: "Exito", name: req.name, rol: req.rol});
 })
 
-
 app.get('/logout', (req, res) => {
     res.clearCookie('token');
     return res.json({Status: "Exito"});
@@ -263,7 +256,7 @@ app.get('/data', (req, res) => {
     });
   });
 
-  app.get('/dataPventa', (req, res) => {
+app.get('/dataPventa', (req, res) => {
     db.query('SELECT * FROM productos WHERE cantidad > 0', (error, results, fields) => {
       if (error) {
         console.error('Database query error:', error);
@@ -274,7 +267,7 @@ app.get('/data', (req, res) => {
     });
   });
 
-  app.get('/dataFaltantes', (req, res) => {
+app.get('/dataFaltantes', (req, res) => {
     const sql = 'SELECT * FROM productos WHERE cantidad < cantidad_minima';
     db.query(sql, (error, results, fields) => {
       if (error) {
@@ -286,7 +279,7 @@ app.get('/data', (req, res) => {
     });
   });
 
-  app.get('/data_usuarios', (req, res) => {
+app.get('/data_usuarios', (req, res) => {
     db.query('SELECT usuario, nombre, apellido_paterno, apellido_materno, rol, texto_plano, contrasena FROM Trabajadores,contrasenas WHERE encriptada=contrasena', (error, results, fields) => {
       if (error) {
         console.error('Database query error:', error);
@@ -313,7 +306,7 @@ app.get('/GetProducto/:codigo', (req, res) => {
     });
 });
 
-  app.delete('/deleteProducto/:codigo', (req, res) => {
+app.delete('/deleteProducto/:codigo', (req, res) => {
     const codigo = req.params.codigo;
     const sql = 'DELETE FROM productos WHERE codigo = ?';
 
@@ -405,12 +398,6 @@ app.get('/GetUserData/:user', (req, res) => {
     });
 })
 
-
-
-app.listen(8080, () => {
-    console.log('Conectado al backend!');
-})
-
 app.get('/generar-pdf', (req, res) => {
     const fonts = {
         Roboto: {
@@ -441,7 +428,7 @@ app.get('/generar-pdf', (req, res) => {
                 {
                     image: './img/faltantes_header.png',
                     width: 530,
-                    margin: [0, 0, 0, 20] //
+                    margin: [0, 0, 0, 20]
                 },
                 {text: 'Lista de Faltantes', style: 'header', alignment: 'center', margin: [0, 0, 0, 40]},
                 {
@@ -552,31 +539,7 @@ app.post('/realizarCobro', async (req, res) => {
     }
 });
 
-
-app.get('/dataPventa', (req, res) => {
-    db.query('SELECT * FROM productos WHERE cantidad>0', (error, results, fields) => {
-      if (error) {
-        console.error('Database query error:', error);
-        res.status(500).json({ error: 'Internal Server Error' });
-        return;
-      }
-      res.json(results);
-    });
-  });
-
-  app.get('/dataPventa', (req, res) => {
-    db.query('SELECT * FROM productos WHERE cantidad>0', (error, results, fields) => {
-      if (error) {
-        console.error('Database query error:', error);
-        res.status(500).json({ error: 'Internal Server Error' });
-        return;
-      }
-      res.json(results);
-    });
-  });
-
-
-  app.post('/imprimir-ticket', (req, res) => {
+app.post('/imprimir-ticket', (req, res) => {
     const fonts = {
         Roboto: {
             normal: path.join(__dirname, 'fonts', 'JosefinSans-Regular.ttf'),
@@ -634,4 +597,20 @@ app.get('/dataPventa', (req, res) => {
 
     pdfDoc.pipe(res);
     pdfDoc.end();
+});
+
+// ✅ RUTA PARA GENERAR CÓDIGO (Ya estaba, se mantiene)
+app.get('/api/productos/generar-codigo', (req, res) => {
+    try {
+        const codigo = Math.random().toString(36).substring(2, 10).toUpperCase();
+        res.json({ codigo: codigo });
+    } catch (error) {
+        console.error("Error al generar código:", error);
+        res.status(500).json({ error: "Error interno del servidor" });
+    }
+});
+
+// --- INICIO SERVIDOR ---
+app.listen(8080, () => {
+    console.log('Conectado al backend!');
 });
