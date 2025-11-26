@@ -1,20 +1,21 @@
-import  { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import DataTable from 'react-data-table-component';
 import axios from 'axios';
-import delIcon from '../assets/inventario/-.svg'
+// import delIcon from '../assets/inventario/-.svg' // COMENTADO: Simulamos que quitamos el guion
 import PropTypes from 'prop-types';
 import modIcon from '../assets/inventario/modIcon.svg'
 import ModificacionProductosModal from './ModificacionProductosModal';
 import EliminarModal from './EliminarModal';
 
 function DataTableComponent({searchTerm}) {
-  const[filteredData, setFilteredData] = useState([]);
+  const [filteredData, setFilteredData] = useState([]);
   const [data, setData] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [openModal, setOpenModal] = useState(false);
   const [openModalDelete, setOpenModalDelete] = useState(false);
   const [selectedCodigo, setSelectedCodigo] = useState(null);
+
   const customStyles = {
     headRow: {
       style: {
@@ -26,26 +27,28 @@ function DataTableComponent({searchTerm}) {
     },
   }
 
-/*  const handleDelete = async (codigo) => {
-    try {
-      axios.delete(`http://localhost:8080/deleteProducto/${codigo}`);
-      setData(data.filter((row) => row.codigo !== codigo));
-    } catch (error) {
-      console.error('Error deleting data:', error);
-    }
-  };*/
-
+  // --- NUEVO: Lógica para pintar filas rojas (SCRUM-66) ---
+  const conditionalRowStyles = [
+    {
+      when: row => row.cantidad < row.cantidad_minima,
+      style: {
+        backgroundColor: 'rgba(255, 0, 0, 0.2)', // Rojo suave
+        color: 'black',
+        '&:hover': {
+          cursor: 'pointer',
+        },
+      },
+    },
+  ];
 
   const handleDelete = async (codigo) => {
     setSelectedCodigo(codigo);
     setOpenModalDelete(true);
-    {openModal && <EliminarModal closeModal={setOpenModal} codigo={selectedCodigo}/>}
   };
 
   const handleModify = async (codigo) => {
     setSelectedCodigo(codigo);
     setOpenModal(true);
-    {openModal && <ModificacionProductosModal closeModal={setOpenModal} codigo={selectedCodigo}/>}
   };
 
   useEffect(() => {
@@ -68,8 +71,6 @@ function DataTableComponent({searchTerm}) {
     fetchData();
   }, []);
 
-
-
   useEffect(() => {
     if (searchTerm) {
       setFilteredData(data.filter((item) => {
@@ -83,8 +84,6 @@ function DataTableComponent({searchTerm}) {
     }
   }, [data, searchTerm]);
 
-
-
   const columns = [
     { name: 'Producto', selector: (row) => row.nombre, sortable: true },
     { name: 'Cantidad', selector: (row) => row.cantidad, sortable: true },
@@ -94,10 +93,23 @@ function DataTableComponent({searchTerm}) {
     {
       name: '',
       cell: (row) => (
-        <div> 
-          <img src={delIcon} alt="Delete" onClick={() => handleDelete(row.codigo)} />
+        <div style={{display: 'flex', alignItems: 'center', gap: '10px'}}> 
+          {/* --- MODIFICADO: Cambiamos la imagen del guion por una X roja (SCRUM-63) --- */}
+          <div 
+            onClick={() => handleDelete(row.codigo)}
+            style={{
+              color: 'red', 
+              fontWeight: 'bold', 
+              fontSize: '1.5rem', 
+              cursor: 'pointer',
+              fontFamily: 'Arial, sans-serif'
+            }}
+          >
+            X
+          </div>
+
           <img src={modIcon} onClick={() => handleModify(row.codigo)}
-          style={{ width: '50%', height: '40%', marginBottom: '10%', marginLeft: '12%'}} />        
+          style={{ width: '25px', height: '25px', cursor: 'pointer'}} />        
         </div>
       ),
       ignoreRowClick: true,
@@ -116,10 +128,12 @@ function DataTableComponent({searchTerm}) {
       defaultSortFieldId={1}
       pagination
       responsive
-      aginationPerPage={5}
+      paginationPerPage={5}
       fixedHeader
       fixedHeaderScrollHeight="50%"
       customStyles={customStyles}
+      // --- AQUÍ APLICAMOS EL ESTILO CONDICIONAL ---
+      conditionalRowStyles={conditionalRowStyles} 
       paginationRowsPerPageOptions={[5, 10, 15, 20, 25, 30]}
     />
 
@@ -128,7 +142,6 @@ function DataTableComponent({searchTerm}) {
 
     </>
   );
-  
 }
 
 DataTableComponent.propTypes = {
