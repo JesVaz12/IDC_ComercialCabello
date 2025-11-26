@@ -84,6 +84,7 @@ function DataTableComponent({searchTerm}) {
     }
   }, [data, searchTerm]);
 
+  // Definición de las columnas de la tabla
   const columns = [
     { name: 'Producto', selector: (row) => row.nombre, sortable: true },
     { name: 'Cantidad', selector: (row) => row.cantidad, sortable: true },

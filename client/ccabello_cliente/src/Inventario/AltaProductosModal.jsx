@@ -1,4 +1,4 @@
-import './Modal.css'
+import '../Punto_de_venta/Modal.css'
 import PropTypes from 'prop-types';
 import axios from 'axios'
 import { useState } from 'react'
@@ -16,6 +16,7 @@ function AltaProductosModal({ closeModal }) {
     const handleSubmit = (event) => {
         event.preventDefault();
         console.log(values);
+        
         axios.post('http://localhost:8080/insertarProducto', values)
             .then(res => {
                 if (res.data.Status === 'Exito') {
@@ -31,19 +32,16 @@ function AltaProductosModal({ closeModal }) {
         const { name, value } = e.target;
         let newValue = value;
 
-        // Apply different length restrictions for each field
+        // Validaciones de longitud
         switch (name) {
-            case 'codigo':
-                newValue = value.slice(0, 13); // Limit to 1 digit for 'codigo'
-                break;
             case 'cantidad_minima':
-                newValue = value.slice(0, 5); // Limit to 3 digits for 'cantidad_minima'
+                newValue = value.slice(0, 5); 
                 break;
             case 'cantidad':
-                newValue = value.slice(0, 5); // Limit to 2 digits for 'cantidad'
+                newValue = value.slice(0, 5); 
                 break;
             case 'precio':
-                newValue = value.slice(0, 10); // Limit to 5 digits for 'precio'
+                newValue = value.slice(0, 10); 
                 break;
             default:
                 break;
@@ -55,20 +53,21 @@ function AltaProductosModal({ closeModal }) {
     const handleKeyDown = (e) => {
         const { name } = e.target;
         const maxLength = {
-            codigo: 13,
-            cantidad_minima: 5,
-            cantidad: 5,
-            precio: 10,
+            'cantidad_minima': 5,
+            'cantidad': 5,
+            'precio': 10,
         };
-        const actualLength = values[name].replace(/\./g, '').length;
 
-        if (['codigo', 'cantidad_minima', 'cantidad', 'precio'].includes(name)) {
-            if( e.key === '-'){
+        if (['cantidad_minima', 'cantidad', 'precio'].includes(name)) {
+            const actualLength = values[name].replace(/\./g, '').length;
+
+            if (e.key === '-') {
                 e.preventDefault();
             }
-            const inputElement = document.getElementById(name);
-            if(!isTextSelected(document.getElementById(inputElement))){
-                if (e.key !== 'Backspace' && e.key !== 'Delete' && e.key!=='Tab' && actualLength >= maxLength[name]) {
+
+            // ✅ CORRECCIÓN APLICADA: Usamos e.target directamente para evitar el error 'Cannot read properties of null'
+            if (!isTextSelected(e.target)) {
+                if (e.key !== 'Backspace' && e.key !== 'Delete' && e.key !== 'Tab' && actualLength >= maxLength[name]) {
                     e.preventDefault();
                 }
             }
@@ -83,6 +82,19 @@ function AltaProductosModal({ closeModal }) {
             return document.selection.createRange().text == input.value;
         }
     }
+
+    const handleGenerateCode = async () => {
+        try {
+            const res = await axios.get('http://localhost:8080/api/productos/generar-codigo');
+            if (res.data.codigo) {
+                setValues(prev => ({ ...prev, codigo: res.data.codigo }));
+                toast.success('¡Código único generado!');
+            }
+        } catch (err) {
+            console.error("Error al generar el código:", err);
+            toast.error('No se pudo generar el código.');
+        }
+    };
 
     return (
         <>
@@ -105,20 +117,39 @@ function AltaProductosModal({ closeModal }) {
                                     onChange={handleChange}
                                 />
                             </div>
+
                             <div className='inputLabel'>
                                 <label className="labelModal" htmlFor='codigo'>Código</label>
-                                <input className="inputAlta"
-                                    required
-                                    type='number'
-                                    id="codigo"
-                                    name='codigo'
-                                    step="any"
-                                    min='0'
-                                    value={values.codigo}
-                                    onChange={handleChange}
-                                    onKeyDown={handleKeyDown}
-                                />
+                                <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+                                    <input className="inputAlta"
+                                        style={{ flexGrow: 1, backgroundColor: '#eee' }}
+                                        required
+                                        type='text'
+                                        id="codigo"
+                                        name='codigo'
+                                        value={values.codigo}
+                                        placeholder="Clic en 'Generar'..."
+                                        readOnly
+                                    />
+                                    <button
+                                        type="button"
+                                        onClick={handleGenerateCode}
+                                        className="generarButton"
+                                        style={{
+                                            padding: '8px 12px',
+                                            backgroundColor: '#007bff',
+                                            color: 'white',
+                                            border: 'none',
+                                            borderRadius: '5px',
+                                            cursor: 'pointer',
+                                            whiteSpace: 'nowrap'
+                                        }}
+                                    >
+                                        Generar
+                                    </button>
+                                </div>
                             </div>
+
                             <div className='inputLabel'>
                                 <label className="labelModal" htmlFor='precio'>Precio</label>
                                 <input className="inputAlta"
