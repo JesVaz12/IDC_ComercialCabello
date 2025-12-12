@@ -12,7 +12,7 @@ const modalStyles = {
     display: 'flex',
     justifyContent: 'center',
     alignItems: 'center',
-    zIndex: 1000, 
+    zIndex: 1000,
   },
   modal: {
     backgroundColor: 'white',
@@ -20,7 +20,7 @@ const modalStyles = {
     borderRadius: '8px',
     width: '400px',
     boxShadow: '0 4px 10px rgba(0, 0, 0, 0.2)',
-    overflow: 'hidden', 
+    overflow: 'hidden',
   },
   header: {
     backgroundColor: '#9B1313',
@@ -80,18 +80,18 @@ function EliminarUsuarioModal({ closeModal, usuario }) {
 
   const handleConfirmDelete = async () => {
     try {
-      await axios.delete(`http://localhost:8080/deleteUsuario/${usuario.usuario}`, {
-        withCredentials: true 
+      await axios.delete(`http://alb-comercial-2000369602.us-east-2.elb.amazonaws.com/deleteUsuario/${usuario.usuario}`, {
+        withCredentials: true
       });
       alert('Usuario eliminado correctamente');
-      closeModal(); 
+      closeModal();
     } catch (error) {
       console.error('Error al eliminar el usuario:', error);
       alert('Hubo un error al eliminar el usuario.');
     }
   };
 
-  if (!usuario) return null; 
+  if (!usuario) return null;
 
   return (
     <div style={modalStyles.overlay} onClick={closeModal}>
@@ -114,10 +114,10 @@ function EliminarUsuarioModal({ closeModal, usuario }) {
           <p style={modalStyles.boldText}>Esta acción no puede deshacerse</p>
         </div>
         <div style={modalStyles.footer}>
-          <button style={{...modalStyles.button, ...modalStyles.btnYes}} onClick={handleConfirmDelete}>
+          <button style={{ ...modalStyles.button, ...modalStyles.btnYes }} onClick={handleConfirmDelete}>
             Sí
           </button>
-          <button style={{...modalStyles.button, ...modalStyles.btnNo}} onClick={closeModal}>
+          <button style={{ ...modalStyles.button, ...modalStyles.btnNo }} onClick={closeModal}>
             No
           </button>
         </div>

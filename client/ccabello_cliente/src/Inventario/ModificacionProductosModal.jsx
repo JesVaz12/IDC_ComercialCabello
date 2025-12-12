@@ -4,11 +4,11 @@ import axios from 'axios'
 import { useEffect, useState } from 'react'
 import toast, { Toaster } from 'react-hot-toast';
 
-function ModificacionProductosModal({ closeModal, codigo}) {
+function ModificacionProductosModal({ closeModal, codigo }) {
     useEffect(() => {
         if (codigo) {
-            axios.get(`http://localhost:8080/getProducto/${codigo}`)
-                .then(res => {  
+            axios.get(`http://alb-comercial-2000369602.us-east-2.elb.amazonaws.com/getProducto/${codigo}`)
+                .then(res => {
                     if (res.data.Status === 'Exito') {
                         setValues({
                             codigo: res.data.Producto.codigo,
@@ -27,8 +27,8 @@ function ModificacionProductosModal({ closeModal, codigo}) {
                 });
         }
     }, [codigo]);
-    
-    
+
+
 
     const [values, setValues] = useState({
         codigo: '',
@@ -42,7 +42,7 @@ function ModificacionProductosModal({ closeModal, codigo}) {
     const handleSubmit = (event) => {
         event.preventDefault();
         console.log(values);
-        axios.post('http://localhost:8080/modificarProducto', values)
+        axios.post('http://alb-comercial-2000369602.us-east-2.elb.amazonaws.com/modificarProducto', values)
             .then(res => {
                 if (res.data.Status === 'Exito') {
                     localStorage.setItem('showToast', 'Producto modificado con éxito');
@@ -90,12 +90,12 @@ function ModificacionProductosModal({ closeModal, codigo}) {
         const actualLength = values[name].replace(/\./g, '').length;
 
         if (['codigo', 'cantidad_minima', 'cantidad', 'precio'].includes(name)) {
-            if( e.key === '-'){
+            if (e.key === '-') {
                 e.preventDefault();
             }
             const inputElement = document.getElementById(name);
-            if(!isTextSelected(document.getElementById(inputElement))){
-                if (e.key !== 'Backspace' && e.key !== 'Delete' && e.key!=='Tab' && actualLength >= maxLength[name]) {
+            if (!isTextSelected(document.getElementById(inputElement))) {
+                if (e.key !== 'Backspace' && e.key !== 'Delete' && e.key !== 'Tab' && actualLength >= maxLength[name]) {
                     e.preventDefault();
                 }
             }
@@ -134,7 +134,7 @@ function ModificacionProductosModal({ closeModal, codigo}) {
                             </div>
                             <div className='inputLabel'>
                                 <label className="labelModal" htmlFor='codigo'>Código</label>
-                                <p style={{color: 'black', marginLeft: '5vw'}}>{values.codigo}</p>
+                                <p style={{ color: 'black', marginLeft: '5vw' }}>{values.codigo}</p>
                             </div>
                             <div className='inputLabel'>
                                 <label className="labelModal" htmlFor='precio'>Precio</label>

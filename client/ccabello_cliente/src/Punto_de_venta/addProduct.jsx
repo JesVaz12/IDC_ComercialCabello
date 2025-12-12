@@ -34,7 +34,7 @@ function AddProduct({ onProductSelect }) {
     setSelectedOption(null);
     if (onProductSelect) {
       onProductSelect(option);
-    } 
+    }
   };
 
   const handleProductSelect = (selectedOption) => {
@@ -46,7 +46,7 @@ function AddProduct({ onProductSelect }) {
     async function fetchAllRecords() {
       setIsLoading(true);
       try {
-        const response = await axios.get('http://localhost:8080/dataPventa');
+        const response = await axios.get('http://alb-comercial-2000369602.us-east-2.elb.amazonaws.com/dataPventa');
 
         const formattedOptions = response.data.map(item => ({
           value: item.codigo,
@@ -78,7 +78,7 @@ function AddProduct({ onProductSelect }) {
         onInputChange={(inputValue, { action }) => {
           if (action === 'input-change') {
             const sanitizedInput = inputValue.replace(/[^a-zA-Z0-9 ]/g, '');
-        
+
             if (sanitizedInput.length <= 35) {
               setSearchInput(sanitizedInput);
             }
@@ -100,7 +100,7 @@ function AddProduct({ onProductSelect }) {
           }),
           control: (base) => ({
             ...base,
-            backgroundColor: 'white', 
+            backgroundColor: 'white',
           }),
           menu: (base) => ({
             ...base,
@@ -110,7 +110,7 @@ function AddProduct({ onProductSelect }) {
           }),
           option: (base, state) => ({
             ...base,
-            backgroundColor: state.isFocused ? '#9B1313' : 'white', 
+            backgroundColor: state.isFocused ? '#9B1313' : 'white',
             color: state.isFocused ? 'white' : 'black',
             fontWeight: state.isSelected ? 'bold' : 'normal',
             fontSize: '1rem',
@@ -140,7 +140,7 @@ function AddProduct({ onProductSelect }) {
           fontStyle: 'italic',
           marginTop: '1em',
           backgroundColor: 'black'
-          
+
         }}
       >
       </div>

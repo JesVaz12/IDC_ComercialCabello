@@ -16,8 +16,8 @@ function AltaProductosModal({ closeModal }) {
     const handleSubmit = (event) => {
         event.preventDefault();
         console.log(values);
-        
-        axios.post('http://localhost:8080/insertarProducto', values)
+
+        axios.post('http://alb-comercial-2000369602.us-east-2.elb.amazonaws.com/insertarProducto', values)
             .then(res => {
                 if (res.data.Status === 'Exito') {
                     window.location.reload();
@@ -35,13 +35,13 @@ function AltaProductosModal({ closeModal }) {
         // Validaciones de longitud
         switch (name) {
             case 'cantidad_minima':
-                newValue = value.slice(0, 5); 
+                newValue = value.slice(0, 5);
                 break;
             case 'cantidad':
-                newValue = value.slice(0, 5); 
+                newValue = value.slice(0, 5);
                 break;
             case 'precio':
-                newValue = value.slice(0, 10); 
+                newValue = value.slice(0, 10);
                 break;
             default:
                 break;
@@ -85,7 +85,7 @@ function AltaProductosModal({ closeModal }) {
 
     const handleGenerateCode = async () => {
         try {
-            const res = await axios.get('http://localhost:8080/api/productos/generar-codigo');
+            const res = await axios.get('http://alb-comercial-2000369602.us-east-2.elb.amazonaws.com/api/productos/generar-codigo');
             if (res.data.codigo) {
                 setValues(prev => ({ ...prev, codigo: res.data.codigo }));
                 toast.success('¡Código único generado!');

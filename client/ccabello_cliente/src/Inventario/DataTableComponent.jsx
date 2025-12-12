@@ -15,7 +15,7 @@ function DataTableComponent({ searchTerm }) {
   const [openModal, setOpenModal] = useState(false);
   const [openModalDelete, setOpenModalDelete] = useState(false);
   const [selectedCodigo, setSelectedCodigo] = useState(null);
-  
+
   // Estilos de la cabecera
   const customStyles = {
     headRow: {
@@ -60,7 +60,7 @@ function DataTableComponent({ searchTerm }) {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const response = await axios.get('http://localhost:8080/data');
+        const response = await axios.get('http://alb-comercial-2000369602.us-east-2.elb.amazonaws.com/data');
         setData(response.data);
         setFilteredData(response.data);
       } catch (error) {
@@ -77,7 +77,7 @@ function DataTableComponent({ searchTerm }) {
       setFilteredData(data);
       return;
     }
-    
+
     if (searchTerm && searchTerm.value !== undefined && searchTerm.value !== null) {
       const busqueda = searchTerm.value;
       const filtered = data.filter((row) =>
@@ -117,7 +117,7 @@ function DataTableComponent({ searchTerm }) {
           >
             {'\u00D7'}
           </button>
-          
+
           {/* Mantenemos el icono de modificar */}
           <img
             src={modIcon}
@@ -149,7 +149,7 @@ function DataTableComponent({ searchTerm }) {
         fixedHeaderScrollHeight="50%"
         customStyles={customStyles}
         paginationRowsPerPageOptions={[5, 10, 15, 20, 25, 30]}
-        
+
         // --- APLICAMOS LA NUEVA FUNCIONALIDAD ---
         conditionalRowStyles={conditionalRowStyles}
       />

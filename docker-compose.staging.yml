@@ -1,5 +1,5 @@
 services:
-  mi-mysql-db: # El nombre que busca el backend
+  mi-mysql-db:
     image: mysql:latest
     container_name: staging-mysql-db
     environment:
@@ -10,30 +10,38 @@ services:
       - staging_db_data:/var/lib/mysql
     networks:
       - staging-red
-    # --- AÑADIDO: CHEQUEO DE SALUD ---
-    # Esto revisa si MySQL está listo para aceptar conexiones
     healthcheck:
-      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "root", "-p${MYSQL_ROOT_PASSWORD}"]
+      test:
+        [
+          "CMD",
+          "mysqladmin",
+          "ping",
+          "-h",
+          "localhost",
+          "-u",
+          "root",
+          "-p${MYSQL_ROOT_PASSWORD}",
+        ]
       interval: 10s
       timeout: 5s
       retries: 5
-      start_period: 30s # Dale 30 segundos para que inicie antes de checar
+      start_period: 30s
 
   backend:
     build:
-      context: .
-      dockerfile: backend.Dockerfile
+      # ✅ CAMBIO: Ahora apunta a la carpeta 'backend'
+      context: ./backend
+      # ✅ CAMBIO: Busca el archivo 'Dockerfile' estándar
+      dockerfile: Dockerfile
     container_name: staging-app-backend
     ports:
       - "8080:8080"
     networks:
       - staging-red
-    # --- MODIFICADO: depends_on ahora espera a que el healthcheck pase ---
     depends_on:
       mi-mysql-db:
-        condition: service_healthy 
+        condition: service_healthy
     environment:
-      # Variables que enviaremos al backend
       DB_HOST: mi-mysql-db
       DB_USER: root
       DB_PASSWORD: ${STAGING_DB_PASSWORD}
@@ -42,8 +50,10 @@ services:
 
   frontend:
     build:
-      context: .
-      dockerfile: client.Dockerfile
+      # ✅ CAMBIO: Ahora apunta a la carpeta del cliente
+      context: ./client/ccabello_cliente
+      # ✅ CAMBIO: Busca el archivo 'Dockerfile' estándar
+      dockerfile: Dockerfile
     container_name: staging-app-frontend
     ports:
       - "8082:80"

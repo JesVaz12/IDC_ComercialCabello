@@ -29,12 +29,12 @@ function DataTableComponent({ searchTerm }) {
   };
 
   const handleDelete = (usuario) => {
-    setSelectedUsuario(usuario); 
+    setSelectedUsuario(usuario);
     setOpenModalDelete(true);
   };
 
   const handleModify = (usuario) => {
-    setSelectedUsuario(usuario); 
+    setSelectedUsuario(usuario);
     setOpenModal(true);
   };
 
@@ -45,22 +45,22 @@ function DataTableComponent({ searchTerm }) {
         // --- INICIO DE LA CORRECCIÓN (Error 403) ---
         // ---
         // Añadimos 'withCredentials: true' para que axios envíe la cookie de login
-        const response = await axios.get('http://localhost:8080/data_usuarios', { 
-          withCredentials: true 
-        }); 
+        const response = await axios.get('http://alb-comercial-2000369602.us-east-2.elb.amazonaws.com/data_usuarios', {
+          withCredentials: true
+        });
         // ---
         // --- FIN DE LA CORRECCIÓN ---
         // ---
         setData(response.data);
         setFilteredData(response.data);
       } catch (error) {
-        setError(error); 
+        setError(error);
       } finally {
         setLoading(false);
       }
     };
     fetchData();
-  }, [openModal, openModalDelete]); 
+  }, [openModal, openModalDelete]);
 
   useEffect(() => {
     if (searchTerm === null) {
@@ -89,7 +89,7 @@ function DataTableComponent({ searchTerm }) {
       cell: (row) => (
         <div style={{ display: 'flex', alignItems: 'center', gap: '10px', height: '100%' }}>
           <button
-            onClick={() => handleDelete(row)} 
+            onClick={() => handleDelete(row)}
             style={{
               color: 'red',
               background: 'none',
@@ -104,10 +104,10 @@ function DataTableComponent({ searchTerm }) {
           >
             {'\u00D7'}
           </button>
-          
+
           <img
             src={modIcon}
-            onClick={() => handleModify(row)} 
+            onClick={() => handleModify(row)}
             style={{ width: '24px', height: '24px', cursor: 'pointer' }}
             alt="Modificar"
             title="Modificar"
@@ -120,7 +120,7 @@ function DataTableComponent({ searchTerm }) {
   ];
 
   if (loading) return <p>Loading...</p>;
-  if (error) return <p>Error: {error.message}</p>; 
+  if (error) return <p>Error: {error.message}</p>;
 
   return (
     <>

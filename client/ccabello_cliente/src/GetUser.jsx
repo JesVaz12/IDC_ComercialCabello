@@ -2,30 +2,30 @@ import { useEffect } from 'react'
 import axios from 'axios'
 import { useState } from 'react'
 
-function GetUser(){
-    const [name,setName] = useState();
-    const [rol,setRol] = useState();
+function GetUser() {
+  const [name, setName] = useState();
+  const [rol, setRol] = useState();
 
-    useEffect(() => {
-        axios.get('http://localhost:8080/GetUser',{ withCredentials: true })
-          .then(response => {
-            const name = response.data.name;
-            const rol = response.data.rol;
-            setName(name);
-            setRol(rol)
-            console.log(name);
-          })
-          .catch(error => {
-            console.error(error);
-          });
-      }, []);
+  useEffect(() => {
+    axios.get('http://alb-comercial-2000369602.us-east-2.elb.amazonaws.com/GetUser', { withCredentials: true })
+      .then(response => {
+        const name = response.data.name;
+        const rol = response.data.rol;
+        setName(name);
+        setRol(rol)
+        console.log(name);
+      })
+      .catch(error => {
+        console.error(error);
+      });
+  }, []);
 
-      return(
-        <>
-            <h2 style={{marginBottom: '0',marginLeft:'7%', textAlign:'center'}}>{name}</h2>
-            <p style={{textAlign:'center',fontSize:'130%',marginTop:'0'}}>{rol}</p>
-        </>
-      )
+  return (
+    <>
+      <h2 style={{ marginBottom: '0', marginLeft: '7%', textAlign: 'center' }}>{name}</h2>
+      <p style={{ textAlign: 'center', fontSize: '130%', marginTop: '0' }}>{rol}</p>
+    </>
+  )
 }
 
 export default GetUser

@@ -1,4 +1,4 @@
-import  { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import DataTable from 'react-data-table-component';
 import axios from 'axios';
 import ModificacionProductosModal from './ModificacionProductosModal';
@@ -22,12 +22,12 @@ function DataTableComponentFaltantes() {
   useEffect(() => {
     async function fetchData() {
       try {
-        const response = await axios.get('http://localhost:8080/dataFaltantes');
+        const response = await axios.get('http://alb-comercial-2000369602.us-east-2.elb.amazonaws.com/dataFaltantes');
         const processedData = response.data.map((item) => ({
           ...item,
-          cantidad: parseInt(item.cantidad, 10), 
-          precio: parseFloat(item.precio), 
-          cantidad_minima: parseInt(item.cantidad_minima, 10), 
+          cantidad: parseInt(item.cantidad, 10),
+          precio: parseFloat(item.precio),
+          cantidad_minima: parseInt(item.cantidad_minima, 10),
         }));
         setData(processedData);
         setLoading(false);
@@ -47,9 +47,9 @@ function DataTableComponentFaltantes() {
   const columns = [
     { name: 'Producto', selector: (row) => row.nombre, sortable: true },
     { name: 'Cantidad', selector: (row) => row.cantidad, sortable: true },
-    { name: 'Código', selector: (row) => row.codigo},
+    { name: 'Código', selector: (row) => row.codigo },
     { name: 'Precio', selector: (row) => row.precio, sortable: true },
-    { name: 'Cantidad Mínima', selector: (row) => row.cantidad_minima, sortable: true},
+    { name: 'Cantidad Mínima', selector: (row) => row.cantidad_minima, sortable: true },
   ];
 
   if (loading) return <p>Loading...</p>;
@@ -57,25 +57,25 @@ function DataTableComponentFaltantes() {
 
   return (
     <>
-    <DataTable
-      columns={columns}
-      data={data} 
-      noDataComponent="Producto no disponible"
-      defaultSortFieldId={1}
-      pagination
-      responsive
-      aginationPerPage={5}
-      fixedHeader
-      fixedHeaderScrollHeight="50%"
-      customStyles={customStyles}
-      paginationRowsPerPageOptions={[5, 10, 15, 20, 25, 30]}
-    />
+      <DataTable
+        columns={columns}
+        data={data}
+        noDataComponent="Producto no disponible"
+        defaultSortFieldId={1}
+        pagination
+        responsive
+        aginationPerPage={5}
+        fixedHeader
+        fixedHeaderScrollHeight="50%"
+        customStyles={customStyles}
+        paginationRowsPerPageOptions={[5, 10, 15, 20, 25, 30]}
+      />
 
-    {openModal && <ModificacionProductosModal closeModal={() => setOpenModal(false)} />}
+      {openModal && <ModificacionProductosModal closeModal={() => setOpenModal(false)} />}
 
     </>
   );
-  
+
 }
 
 export default DataTableComponentFaltantes;

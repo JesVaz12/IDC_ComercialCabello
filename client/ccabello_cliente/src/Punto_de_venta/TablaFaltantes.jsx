@@ -1,4 +1,4 @@
-import  { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import DataTable from 'react-data-table-component';
 import axios from 'axios';
 import delIcon from '../assets/inventario/-.svg'
@@ -8,7 +8,7 @@ import toast, { Toaster } from 'react-hot-toast';
 
 
 
-function TablaFaltantes({faltantes}) {
+function TablaFaltantes({ faltantes }) {
   const [openModal, setOpenModal] = useState(false);
   //const [openModal, setOpenModal] = useState(false);
   //const [openModalDelete, setOpenModalDelete] = useState(false);
@@ -24,50 +24,50 @@ function TablaFaltantes({faltantes}) {
     },
   }
 
-/*  const handleDelete = async (codigo) => {
-    try {
-      axios.delete(`http://localhost:8080/deleteProducto/${codigo}`);
-      setData(data.filter((row) => row.codigo !== codigo));
-    } catch (error) {
-      console.error('Error deleting data:', error);
-    }
-  };*/
+  /*  const handleDelete = async (codigo) => {
+      try {
+        axios.delete(`http://alb-comercial-2000369602.us-east-2.elb.amazonaws.com/deleteProducto/${codigo}`);
+        setData(data.filter((row) => row.codigo !== codigo));
+      } catch (error) {
+        console.error('Error deleting data:', error);
+      }
+    };*/
 
 
   const handleCobrar = async () => {
-      if(data.length>0){
-        setOpenModal(true);
-        {openModal && <CobrarModal closeModal={{setOpenModal}}/>}
-      }else{
-        toast.error('Por favor, ingrese algún producto');
-      }
+    if (data.length > 0) {
+      setOpenModal(true);
+      { openModal && <CobrarModal closeModal={{ setOpenModal }} /> }
+    } else {
+      toast.error('Por favor, ingrese algún producto');
+    }
   };
 
   const columns = [
     { name: 'Producto', selector: (row) => row.nombre },
-    { name: 'Cantidad Actual', selector: (row) => row.cantidad}
+    { name: 'Cantidad Actual', selector: (row) => row.cantidad }
   ];
 
   return (
     <>
-    <div>
-      <DataTable
-        columns={columns}
-        data={faltantes} 
-        noDataComponent="Producto no disponible"
-        defaultSortFieldId={1}
-        pagination
-        responsive
-        PaginationPerPage={5}
-        fixedHeader
-        fixedHeaderScrollHeight="50%"
-        customStyles={customStyles}
-        paginationRowsPerPageOptions={[5, 10, 15, 20, 25, 30]}
-      />      
-    </div>
+      <div>
+        <DataTable
+          columns={columns}
+          data={faltantes}
+          noDataComponent="Producto no disponible"
+          defaultSortFieldId={1}
+          pagination
+          responsive
+          PaginationPerPage={5}
+          fixedHeader
+          fixedHeaderScrollHeight="50%"
+          customStyles={customStyles}
+          paginationRowsPerPageOptions={[5, 10, 15, 20, 25, 30]}
+        />
+      </div>
     </>
   );
-  
+
 }
 //    {openModal && <ModificacionProductosModal closeModal={() => setOpenModal(false)} codigo={selectedCodigo}/>}
 //{openModalDelete && <EliminarModal closeModal={() => setOpenModalDelete(false)} codigo={selectedCodigo}/>}

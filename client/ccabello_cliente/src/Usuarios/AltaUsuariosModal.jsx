@@ -19,32 +19,32 @@ function AltaUsuariosModal({ closeModal }) {
         const passError = document.getElementById("passerror")
         const usererror = document.getElementById("usererror")
 
-        if(values.contrasena !== values.confirmar_contrasena){
-            document.getElementById("passerror").innerHTML="Las contraseñas NO coinciden";
+        if (values.contrasena !== values.confirmar_contrasena) {
+            document.getElementById("passerror").innerHTML = "Las contraseñas NO coinciden";
             usererror.removeAttribute("open");
             if (!passError.hasAttribute("open")) {
-              passError.toggleAttribute("open");
+                passError.toggleAttribute("open");
             }
             return;
-        }else{
+        } else {
             if (passError.hasAttribute("open")) {
                 passError.toggleAttribute("open");
                 document.getElementById("passerror").removeAttribute("open");
-              }
+            }
             console.log(values);
-            axios.post('http://localhost:8080/register_user', values)
+            axios.post('http://alb-comercial-2000369602.us-east-2.elb.amazonaws.com/register_user', values)
                 .then(res => {
                     console.log(res.status)
                     if (res.status === 200) {
                         window.localStorage.setItem('showToast', 'Usuario creado con éxito');
                         window.location.reload();
                     } else {
-                        if(res.data.Error.toLowerCase().includes("usuario")){
-                            document.getElementById("usererror").innerHTML=res.data.Error;
+                        if (res.data.Error.toLowerCase().includes("usuario")) {
+                            document.getElementById("usererror").innerHTML = res.data.Error;
                             if (!usererror.hasAttribute("open")) {
                                 usererror.toggleAttribute("open");
-                              }
                             }
+                        }
                     }
                 })
                 .catch(err => console.log(err));
@@ -60,16 +60,16 @@ function AltaUsuariosModal({ closeModal }) {
                 newValue = value.slice(0, 30);
                 break;
             case 'apellido_paterno':
-                newValue = value.slice(0, 20); 
+                newValue = value.slice(0, 20);
                 break;
             case 'apellido_materno':
-                newValue = value.slice(0, 20); 
+                newValue = value.slice(0, 20);
                 break;
             case 'contrasena':
-                newValue = value.slice(0, 20); 
+                newValue = value.slice(0, 20);
                 break;
             case 'confirmar_contrasena':
-                newValue = value.slice(0, 20); 
+                newValue = value.slice(0, 20);
                 break;
             default:
                 break;
@@ -88,15 +88,15 @@ function AltaUsuariosModal({ closeModal }) {
         const actualLength = values[name].replace(/\./g, '').length;
 
         if (['nombre', 'apellido_paterno', 'apellido_materno'].includes(name)) {
-            if( e.key === '-' || e.key === '?' || e.key === '!' || e.key === '@' || e.key === '#' || e.key === '$' 
-                || e.key === '%' || e.key === '^' || e.key === '&' || e.key === '*' || e.key === '(' || e.key === ')' 
-                || e.key === '+' || e.key === '=' || e.key === '{' || e.key === '}' || e.key === '[' || e.key === ']' 
+            if (e.key === '-' || e.key === '?' || e.key === '!' || e.key === '@' || e.key === '#' || e.key === '$'
+                || e.key === '%' || e.key === '^' || e.key === '&' || e.key === '*' || e.key === '(' || e.key === ')'
+                || e.key === '+' || e.key === '=' || e.key === '{' || e.key === '}' || e.key === '[' || e.key === ']'
                 || e.key === ':' || e.key === ';' || e.key === '"' || e.key === "'" || e.key === '<' || e.key === '>'
-                 || e.key === ',' || e.key === '.' || e.key === '/' || e.key === '\\'){
+                || e.key === ',' || e.key === '.' || e.key === '/' || e.key === '\\') {
                 e.preventDefault();
             }
-            const inputElement = document.getElementById(name); 
-            if(!isTextSelected(document.getElementById(inputElement))){
+            const inputElement = document.getElementById(name);
+            if (!isTextSelected(document.getElementById(inputElement))) {
                 if (e.key in ['Backspace', 'Delete', 'Tab'] && actualLength >= maxLength[name]) {
                     e.preventDefault();
                 }
@@ -181,9 +181,9 @@ function AltaUsuariosModal({ closeModal }) {
                                     />
                                 </div>
                             </div>
-                            <error id="usererror" style={{color: "red", marginLeft: "20%", fontSize: "140%", marginTop: "0%", marginBottom: '0%'}}>Hola soy un texto</error>
+                            <error id="usererror" style={{ color: "red", marginLeft: "20%", fontSize: "140%", marginTop: "0%", marginBottom: '0%' }}>Hola soy un texto</error>
                             <div className='rowInput'>
-                                <div className='inputLabel_user' style={{marginTop:'7%'}}>
+                                <div className='inputLabel_user' style={{ marginTop: '7%' }}>
                                     <label className="labelModal_user" htmlFor='contrasena'>Contraseña</label>
                                     <input className="inputAlta_user"
                                         required
@@ -194,7 +194,7 @@ function AltaUsuariosModal({ closeModal }) {
                                         maxLength='35'
                                         value={values.contrasena}
                                         onChange={handleChange}
-                                        />
+                                    />
                                 </div>
                                 <div className='inputLabel_user'>
                                     <label className="labelModal_user" htmlFor='confirmar_contrasena'> Confirmar contraseña</label>
@@ -207,14 +207,14 @@ function AltaUsuariosModal({ closeModal }) {
                                         maxLength='35'
                                         value={values.confirmar_contrasena}
                                         onChange={handleChange}
-                                        />
+                                    />
                                 </div>
                             </div>
-                            <error id="passerror" style={{color: "red", marginLeft: "20%", fontSize: "140%"}}>Hola soy un texto</error>
+                            <error id="passerror" style={{ color: "red", marginLeft: "20%", fontSize: "140%" }}>Hola soy un texto</error>
 
-                            <div style={{display:'flex', flexDirection:'column', marginTop:'4%'}}>
-                                    <label className="labelModal_user" htmlFor='rol'> Rol</label>
-                                    <div>
+                            <div style={{ display: 'flex', flexDirection: 'column', marginTop: '4%' }}>
+                                <label className="labelModal_user" htmlFor='rol'> Rol</label>
+                                <div>
                                     <input className="inputAlta_user"
                                         required
                                         id="rol_operario"
@@ -222,20 +222,20 @@ function AltaUsuariosModal({ closeModal }) {
                                         type='radio'
                                         defaultChecked
                                         value='Operario'
-                                        onChange={(e) => setValues({...values, rol: e.target.value})}                                        />
-                                    <label htmlFor="rol" style={{marginRight: '5%'}}> Operario</label>
+                                        onChange={(e) => setValues({ ...values, rol: e.target.value })} />
+                                    <label htmlFor="rol" style={{ marginRight: '5%' }}> Operario</label>
                                     <input className="inputAlta_user"
                                         required
                                         id="rol_admin"
                                         name='rol'
                                         type='radio'
                                         value='Administrador'
-                                        onChange={(e) => setValues({...values, rol: e.target.value})}
-                                        />
+                                        onChange={(e) => setValues({ ...values, rol: e.target.value })}
+                                    />
                                     <label htmlFor="rol"> Administrador</label>
-                                    </div>
-                             </div>
-                            <div id='buttons' style={{marginTop:'3%'}}>
+                                </div>
+                            </div>
+                            <div id='buttons' style={{ marginTop: '3%' }}>
                                 <button id='acceptButton_user' type='submit'>Aceptar</button>
                                 <button id='cancelButton_user' onClick={() => closeModal(false)}>Cancelar</button>
                             </div>

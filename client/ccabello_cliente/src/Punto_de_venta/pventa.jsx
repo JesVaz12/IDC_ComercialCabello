@@ -56,7 +56,7 @@ class Pventa extends Component {
   async verifyUser() {
     try {
       axios.defaults.withCredentials = true;
-      const res = await axios.get('http://localhost:8080/');
+      const res = await axios.get('http://alb-comercial-2000369602.us-east-2.elb.amazonaws.com/');
 
       // --> LÍNEA AÑADIDA PARA DEPURACIÓN <--
       console.log('Datos recibidos del servidor:', res.data);

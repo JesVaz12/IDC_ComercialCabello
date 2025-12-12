@@ -101,12 +101,12 @@ function ModificacionUsuarioModal({ closeModal, usuario }) {
       if (!dataToUpdate.password) {
         delete dataToUpdate.password;
       }
-      
+
       // El ID (username) va en la URL, no en el body
       const username = usuario.usuario;
       delete dataToUpdate.usuario; // No se puede modificar el username
-      
-      await axios.put(`http://localhost:8080/usuarios/${username}`, dataToUpdate);
+
+      await axios.put(`http://alb-comercial-2000369602.us-east-2.elb.amazonaws.com/usuarios/${username}`, dataToUpdate);
       alert('Usuario modificado correctamente');
       closeModal();
     } catch (error) {
@@ -122,30 +122,30 @@ function ModificacionUsuarioModal({ closeModal, usuario }) {
       <div style={modalStyles.modal} onClick={(e) => e.stopPropagation()}>
         <div style={modalStyles.header}>Modificar Usuario</div>
         <form style={modalStyles.form} onSubmit={handleSubmit}>
-          
+
           <label style={modalStyles.label}>
             Usuario:
             {/* El nombre de usuario (ID) no se puede editar */}
-            <input 
-              type="text" 
+            <input
+              type="text"
               name="usuario"
               value={formData.usuario}
-              readOnly 
-              style={{...modalStyles.input, backgroundColor: '#EEE'}}
+              readOnly
+              style={{ ...modalStyles.input, backgroundColor: '#EEE' }}
             />
           </label>
 
           <label style={modalStyles.label}>
             Nombre:
-            <input 
-              type="text" 
+            <input
+              type="text"
               name="nombre"
               value={formData.nombre}
               onChange={handleChange}
               style={modalStyles.input}
             />
           </label>
-          
+
           <label style={modalStyles.label}>
             Rol:
             <select
@@ -162,8 +162,8 @@ function ModificacionUsuarioModal({ closeModal, usuario }) {
 
           <label style={modalStyles.label}>
             Contraseña:
-            <input 
-              type="password" 
+            <input
+              type="password"
               name="password"
               placeholder="Dejar en blanco para no cambiar"
               value={formData.password}
@@ -173,10 +173,10 @@ function ModificacionUsuarioModal({ closeModal, usuario }) {
           </label>
 
           <div style={modalStyles.buttonContainer}>
-            <button type="button" style={{...modalStyles.button, ...modalStyles.btnCancel}} onClick={closeModal}>
+            <button type="button" style={{ ...modalStyles.button, ...modalStyles.btnCancel }} onClick={closeModal}>
               Cancelar
             </button>
-            <button type="submit" style={{...modalStyles.button, ...modalStyles.btnSave}}>
+            <button type="submit" style={{ ...modalStyles.button, ...modalStyles.btnSave }}>
               Guardar Cambios
             </button>
           </div>

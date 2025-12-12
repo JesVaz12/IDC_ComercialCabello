@@ -1,4 +1,4 @@
-import  { Component, createRef } from 'react';
+import { Component, createRef } from 'react';
 import './Inventario.css';
 import tienda from '../assets/inventario/tienda.svg';
 import comercial from '../assets/inventario/ComercialCabello.svg';
@@ -7,7 +7,7 @@ import inventario_icon from '../assets/inventario/inventario_icon.svg'
 import usericon from '../assets/inventario/user.svg'
 import usuarios from '../assets/inventario/usuarios.svg'
 import logoutIcon from '../assets/inventario/logout.svg'
-import {Link} from "react-router-dom";
+import { Link } from "react-router-dom";
 import pventa from '../assets/inventario/pventa.svg';
 import tienda_bg from '../assets/inventario/tienda_bg.svg';
 import DataTableComponent from './DataTableComponent';
@@ -29,10 +29,10 @@ class Inventario extends Component {
     this.sidenavmenu = createRef();
     this.state = {
       isAuthenticated: false,
-  };
+    };
     this.openNavbar = this.openNavbar.bind(this);
     this.closeNavbar = this.closeNavbar.bind(this);
-    this.handleSearchChange = this.handleSearchChange.bind(this); 
+    this.handleSearchChange = this.handleSearchChange.bind(this);
   }
 
   async componentDidMount() {
@@ -48,13 +48,13 @@ class Inventario extends Component {
   async verifyUser() {
     try {
       axios.defaults.withCredentials = true;
-      const res = await axios.get('http://localhost:8080/');
+      const res = await axios.get('http://alb-comercial-2000369602.us-east-2.elb.amazonaws.com/');
       if (res.data.Status !== 'Exito') {
         window.location.replace('/');
         console.log(" notverified");
 
       } else {
-        this.setState({ isAuthenticated: true});
+        this.setState({ isAuthenticated: true });
         console.log("verified");
       }
     } catch (error) {
@@ -75,7 +75,8 @@ class Inventario extends Component {
       this.sidenav.current.style.backgroundSize = '350%';
       this.storeButton.current.style.marginLeft = '28%';
       this.ui.current.onclick = this.closeNavbar;
-      this.sleep(250).then(() => {this.sidenavmenu.current.style.display = 'flex';
+      this.sleep(250).then(() => {
+        this.sidenavmenu.current.style.display = 'flex';
       });
       this.ui.current.style.opacity = '.5';
     }
@@ -92,7 +93,7 @@ class Inventario extends Component {
       this.ui.current.style.opacity = '1';
     }
   }
-  
+
   sleep(ms) {
     return new Promise(resolve => setTimeout(resolve, ms));
   }
@@ -101,71 +102,71 @@ class Inventario extends Component {
 
     return (
       <>
-      {
-        this.state.isAuthenticated ?(
-          <div id="screen">
-            <Toaster/>
-          <div id="sidenavbar">
-            <div className="sidenav" id="mySidenav" ref={this.sidenav}>
-              <img
-                src={tienda}
-                id="tienda"
-                ref={this.storeButton}
-                onClick={this.openNavbar}
-                alt="Store Icon"
-              />
-              <div className="sidenavmenu" ref={this.sidenavmenu}>
-                <img src={comercial} alt="Comercial Icon" id="logo"/>
-                <ul className="menu">
-                  <li className="menu-item"  onClick={() => window.location.replace('/punto_de_venta')}>
-                      <img src={pventa}  alt="Punto de Venta" style={{width: "25%"}}/> <span>Punto de Venta</span>
-                  </li>
-                  <li className="menu-item" style={{paddingLeft: "22px"}} onClick={this.closeNavbar}>
-                      <img src={inventario_icon} className="imageIcon" alt="Inventario" style={{width: "25%"}}/> <span>Inventario</span>
+        {
+          this.state.isAuthenticated ? (
+            <div id="screen">
+              <Toaster />
+              <div id="sidenavbar">
+                <div className="sidenav" id="mySidenav" ref={this.sidenav}>
+                  <img
+                    src={tienda}
+                    id="tienda"
+                    ref={this.storeButton}
+                    onClick={this.openNavbar}
+                    alt="Store Icon"
+                  />
+                  <div className="sidenavmenu" ref={this.sidenavmenu}>
+                    <img src={comercial} alt="Comercial Icon" id="logo" />
+                    <ul className="menu">
+                      <li className="menu-item" onClick={() => window.location.replace('/punto_de_venta')}>
+                        <img src={pventa} alt="Punto de Venta" style={{ width: "25%" }} /> <span>Punto de Venta</span>
+                      </li>
+                      <li className="menu-item" style={{ paddingLeft: "22px" }} onClick={this.closeNavbar}>
+                        <img src={inventario_icon} className="imageIcon" alt="Inventario" style={{ width: "25%" }} /> <span>Inventario</span>
 
-                  </li>
-                  <li className="menu-item" style={{paddingLeft: "19px"}} onClick={() => window.location.replace('/usuarios')} >
-                      <img src={usuarios} className="imageIcon" alt="Messages" style={{width: "25%"}} /> <span>Administración de Usuarios</span>
-                  </li>
-                  <li className="menu-item">
-                      <img src={logoutIcon} className="imageIcon" alt="Cerrar Sesión"/> <Logout/>
-                  </li>
-              </ul>    
-                <Link to="/login">  </Link>
-              </div>
-            </div>
-          </div>
-          <div className="ui" id="ui" ref={this.ui}>
-            <div id="header">
-              <img src={inventario} id="logoInventario"></img>
-            </div>
-            <div id="headbar">
-              <div id="userinfo">
-                <img src={usericon}/>
-                <div id="username">
-                <GetUser></GetUser>
+                      </li>
+                      <li className="menu-item" style={{ paddingLeft: "19px" }} onClick={() => window.location.replace('/usuarios')} >
+                        <img src={usuarios} className="imageIcon" alt="Messages" style={{ width: "25%" }} /> <span>Administración de Usuarios</span>
+                      </li>
+                      <li className="menu-item">
+                        <img src={logoutIcon} className="imageIcon" alt="Cerrar Sesión" /> <Logout />
+                      </li>
+                    </ul>
+                    <Link to="/login">  </Link>
+                  </div>
                 </div>
               </div>
-              <div id='buscarDiv'>
-                <p style={{color:'black',fontSize:'120%',marginBottom:'0',marginTop:'0'}}>Buscar Inventario</p>
-                <input id='inputBuscar' placeholder='Nombre o código del producto'
-                 value={this.state.searchTerm} 
-                 onChange={this.handleSearchChange}
-                 ></input>
-              </div>
-              <div id='opciones'>
-              <AltaProductos/>
-              <ListaDeFaltantes/>
+              <div className="ui" id="ui" ref={this.ui}>
+                <div id="header">
+                  <img src={inventario} id="logoInventario"></img>
+                </div>
+                <div id="headbar">
+                  <div id="userinfo">
+                    <img src={usericon} />
+                    <div id="username">
+                      <GetUser></GetUser>
+                    </div>
+                  </div>
+                  <div id='buscarDiv'>
+                    <p style={{ color: 'black', fontSize: '120%', marginBottom: '0', marginTop: '0' }}>Buscar Inventario</p>
+                    <input id='inputBuscar' placeholder='Nombre o código del producto'
+                      value={this.state.searchTerm}
+                      onChange={this.handleSearchChange}
+                    ></input>
+                  </div>
+                  <div id='opciones'>
+                    <AltaProductos />
+                    <ListaDeFaltantes />
+                  </div>
+                </div>
+                <DataTableComponent searchTerm={this.state.searchTerm}></DataTableComponent>
               </div>
             </div>
-              <DataTableComponent searchTerm={this.state.searchTerm}></DataTableComponent>
-          </div>
-        </div>
-        )
-:
-        <div>
-        </div>
-  }
+          )
+            :
+            <div>
+            </div>
+        }
       </>
     );
   }
