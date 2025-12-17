@@ -24,10 +24,12 @@ export default function Login() {
     // Function to handle form submission
     const handleSubmit = (event) => {
         event.preventDefault(); // Prevent default form submission behavior
-        axios.post('http://alb-comercial-2000369602.us-east-2.elb.amazonaws.com/login', values)
+        axios.post('http://alb-comercial-2000369602.us-east-2.elb.amazonaws.com:8080/login', values)
             .then(res => {
+                // ... dentro del .then(res => { ...
                 if (res.data.Status === 'Exito') {
-                    window.location.href = '/inventario'; // <--- AGREGA ESTA LÍNEA
+                    console.log("✅ LOGIN EXITOSO - Redirigiendo a /inventario..."); // <--- AGREGA ESTO
+                    window.location.href = '/inventario'; // <--- CAMBIA 'Inventario' a 'inventario' (minúscula)
                 } else {
                     // Handle and display specific errors from the server
                     const userErrorElement = document.getElementById("usererror");
@@ -49,7 +51,7 @@ export default function Login() {
 
     // useEffect to check for an existing session when the component mounts
     useEffect(() => {
-        axios.get("http://alb-comercial-2000369602.us-east-2.elb.amazonaws.com/")
+        axios.get("http://alb-comercial-2000369602.us-east-2.elb.amazonaws.com:8080/")
             .then((res) => {
                 if (res.data?.Status === "Exito") {
                     setShowLogin(false);

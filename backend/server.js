@@ -13,9 +13,13 @@ import { fileURLToPath } from 'url';
 
 const app = express();
 
-// --- CONFIGURACIÓN CORS ---
+// --- CONFIGURACIÓN CORS (CORREGIDA) ---
 app.use(cors({
-    origin: ["http://localhost:8082", "http://localhost:5173"], 
+    origin: [
+        "http://localhost:8082",
+        "http://localhost:5173",
+        "http://alb-comercial-2000369602.us-east-2.elb.amazonaws.com" // <--- ¡ESTA LÍNEA ES LA CLAVE!
+    ],
     methods: ["POST", "GET", "PUT", "DELETE"],
     credentials: true
 }));
@@ -50,23 +54,23 @@ app.post('/register_user', (req, res) => {
     const sql_password = "INSERT INTO contrasenas(`encriptada`,`texto_plano`) VALUES (?,?)";
     const values = [req.body.usuario.toLowerCase()];
     db.query(sql_select, values, (err, data) => {
-        if(err) return res.json({Error: "Error al buscar el usuario"});
-        if(data.length>0){
-            return res.json({Error: "El USUARIO ya está REGISTRADO"})
+        if (err) return res.json({ Error: "Error al buscar el usuario" });
+        if (data.length > 0) {
+            return res.json({ Error: "El USUARIO ya está REGISTRADO" })
         }
         bcrypt.hash(req.body.contrasena, salt, (err, hash) => {
-            if(err)return res.json({Error: "Error al encriptar la contraseña"});
+            if (err) return res.json({ Error: "Error al encriptar la contraseña" });
             const values = [req.body.nombre.toLowerCase().replace(/(^|\s)\S/gu, c => c.toUpperCase()),
-                req.body.apellido_paterno.toLowerCase().replace(/(^|\s)\S/gu, c => c.toUpperCase()),
-                req.body.apellido_materno.toLowerCase().replace(/(^|\s)\S/gu, c => c.toUpperCase()),
-                req.body.usuario.toLowerCase(), hash, req.body.rol];
+            req.body.apellido_paterno.toLowerCase().replace(/(^|\s)\S/gu, c => c.toUpperCase()),
+            req.body.apellido_materno.toLowerCase().replace(/(^|\s)\S/gu, c => c.toUpperCase()),
+            req.body.usuario.toLowerCase(), hash, req.body.rol];
             db.query(sql, [values], (err, result) => {
-                if(err) return res.json({Error: "Error al registrar el usuario"});
+                if (err) return res.json({ Error: "Error al registrar el usuario" });
                 db.query(sql_password, [hash, req.body.contrasena], (err, result) => {
-                    if(err) return res.json({Error: "Error al registrar la contraseña"});
-                    if(result.affectedRows > 0){
+                    if (err) return res.json({ Error: "Error al registrar la contraseña" });
+                    if (result.affectedRows > 0) {
                         return res.status(200).json({ message: 'Usuario registrado exitosamente' });
-                    }else{
+                    } else {
                         console.log(err);
                     }
                 })
@@ -79,12 +83,12 @@ app.post('/update_user', (req, res) => {
     const sql = "UPDATE Trabajadores SET nombre=?, apellido_paterno=?, apellido_materno=?, contrasena=?, rol=? WHERE usuario=?";
     const password_replace = "UPDATE  contrasenas SET encriptada=?, texto_plano=? WHERE encriptada=(SELECT contrasena from Trabajadores WHERE usuario=?)";
     bcrypt.hash(req.body.contrasena, salt, (err, hash) => {
-        if(err)return res.json({Error: "Error al encriptar la contraseña"});
+        if (err) return res.json({ Error: "Error al encriptar la contraseña" });
         const values = [req.body.nombre.toLowerCase().replace(/(^|\s)\S/gu, c => c.toUpperCase()),
-            req.body.apellido_paterno.toLowerCase().replace(/(^|\s)\S/gu, c => c.toUpperCase()),
-            req.body.apellido_materno.toLowerCase().replace(/(^|\s)\S/gu, c => c.toUpperCase()),
-            hash,req.body.rol, req.body.usuario];
-        db.query(password_replace,[hash,req.body.contrasena,req.body.usuario] , (err, result) => {
+        req.body.apellido_paterno.toLowerCase().replace(/(^|\s)\S/gu, c => c.toUpperCase()),
+        req.body.apellido_materno.toLowerCase().replace(/(^|\s)\S/gu, c => c.toUpperCase()),
+            hash, req.body.rol, req.body.usuario];
+        db.query(password_replace, [hash, req.body.contrasena, req.body.usuario], (err, result) => {
             if (err) {
                 console.error("Database error:", err);
                 return res.status(500).json({ Error: "Error updating user data" });
@@ -149,17 +153,15 @@ app.post('/login', (req, res) => {
 
 // --- RUTAS DE PRODUCTOS ---
 
-// ✅ CORRECCIÓN APLICADA: Se eliminó la validación de entero para el código
 app.post('/insertarProducto', (req, res) => {
     const sql = "INSERT INTO productos(codigo,nombre,precio,cantidad,cantidad_minima) VALUES(?,?,?,?,?)";
     const sql_select_codigo = "SELECT * from productos where codigo=?";
     const sql_select_nombre = "SELECT * from productos where nombre=?";
 
-    // SOLO validamos que CANTIDAD y MINIMA sean números. El código puede ser texto.
     const num_values = [Number(req.body.cantidad), Number(req.body.cantidad_minima)];
-    
+
     const values = [req.body.codigo, req.body.nombre.toLowerCase().replace(/\b\w/g, char => char.toUpperCase()), req.body.precio, req.body.cantidad, req.body.cantidad_minima];
-    
+
     db.query(sql_select_codigo, [req.body.codigo], (err, data) => {
         if (data.length > 0) {
             return res.json({ Error: "El CÓDIGO del producto YA está REGISTRADO" })
@@ -168,7 +170,6 @@ app.post('/insertarProducto', (req, res) => {
                 if (data.length > 0) {
                     return res.json({ Error: "El NOMBRE del producto YA está REGISTRADO" });
                 } else {
-                    // Verificamos solo las cantidades
                     if (Number.isInteger(num_values[0]) && Number.isInteger(num_values[1])) {
                         db.query(sql, values, (err, data) => {
                             if (err) return res.json({ Error: "Ha habido un error al insertar el producto" });
@@ -183,28 +184,28 @@ app.post('/insertarProducto', (req, res) => {
     })
 })
 
-app.post('/modificarProducto',(req, res) => {
-    const sql =" UPDATE productos set nombre=?, precio = ? , cantidad = ? , cantidad_minima = ? WHERE codigo = ?";
+app.post('/modificarProducto', (req, res) => {
+    const sql = " UPDATE productos set nombre=?, precio = ? , cantidad = ? , cantidad_minima = ? WHERE codigo = ?";
     const sql_select_codigo = "SELECT * from productos where codigo=?";
     const sql_select_nombre = "SELECT * from productos where nombre=?";
     const num_values = [Number(req.body.codigo), Number(req.body.cantidad), Number(req.body.cantidad_minima), Number(req.body.precio)];
-    const values = [req.body.nombre.toLowerCase().replace(/\b\w/g, char => char.toUpperCase()),req.body.precio,req.body.cantidad, req.body.cantidad_minima, req.body.codigo];
-    db.query(sql_select_codigo, [req.body.codigo], (err,data) => {
-        if(data.length>1){
-            return res.json({Error: "El CÓDIGO del producto YA está REGISTRADO"})
-        }else{
+    const values = [req.body.nombre.toLowerCase().replace(/\b\w/g, char => char.toUpperCase()), req.body.precio, req.body.cantidad, req.body.cantidad_minima, req.body.codigo];
+    db.query(sql_select_codigo, [req.body.codigo], (err, data) => {
+        if (data.length > 1) {
+            return res.json({ Error: "El CÓDIGO del producto YA está REGISTRADO" })
+        } else {
             const nombre_original = data[0].nombre;
             db.query(sql_select_nombre, [req.body.nombre], (err, data) => {
-                if(data.length>0 && nombre_original != req.body.nombre){
-                    return res.json({Error: "El NOMBRE del producto YA está REGISTRADO"});
-                }else{
-                    if(Number.isInteger(num_values[0]) && Number.isInteger(num_values[1]) && Number.isInteger(num_values[2])){
-                        db.query(sql, values, (err,data) => {
-                            if(err) return res.json({Error: "Ha habido un error al insertar el producto"});
-                            return res.json({Status: "Exito"});
+                if (data.length > 0 && nombre_original != req.body.nombre) {
+                    return res.json({ Error: "El NOMBRE del producto YA está REGISTRADO" });
+                } else {
+                    if (Number.isInteger(num_values[0]) && Number.isInteger(num_values[1]) && Number.isInteger(num_values[2])) {
+                        db.query(sql, values, (err, data) => {
+                            if (err) return res.json({ Error: "Ha habido un error al insertar el producto" });
+                            return res.json({ Status: "Exito" });
                         })
-                    }else{
-                        return res.json({Error: "Por favor, ingrese cantidades ENTERAS"});
+                    } else {
+                        return res.json({ Error: "Por favor, ingrese cantidades ENTERAS" });
                     }
                 }
             })
@@ -216,20 +217,20 @@ app.post('/modificarProducto',(req, res) => {
 
 const verifyUser = (req, res, next) => {
     const token = req.cookies.token;
-    if(!token){
-        return res.json({Error: "No estás autenticado"});
-    }else{
+    if (!token) {
+        return res.json({ Error: "No estás autenticado" });
+    } else {
         jwt.verify(token, "jwt-secret-key", (err, decoded) => {
-            if(err) return res.json({Error: "Token inválido"});
+            if (err) return res.json({ Error: "Token inválido" });
             req.name = decoded.name;
             const sql_select = "SELECT * from Trabajadores where usuario=?";
             db.query(sql_select, [req.name], (err, data) => {
-                if(err) return res.json({Error: "Error al buscar el usuario"});
-                if(data.length>0){
+                if (err) return res.json({ Error: "Error al buscar el usuario" });
+                if (data.length > 0) {
                     req.rol = data[0].rol;
                     next();
-                }else{
-                    return res.json({Error: "Usuario no registrado"});
+                } else {
+                    return res.json({ Error: "Usuario no registrado" });
                 }
             })
         })
@@ -237,58 +238,58 @@ const verifyUser = (req, res, next) => {
 }
 
 app.get('/', verifyUser, (req, res) => {
-    return res.json({Status: "Exito", name: req.name, rol: req.rol});
+    return res.json({ Status: "Exito", name: req.name, rol: req.rol });
 })
 
 app.get('/logout', (req, res) => {
     res.clearCookie('token');
-    return res.json({Status: "Exito"});
+    return res.json({ Status: "Exito" });
 })
 
 app.get('/data', (req, res) => {
     db.query('SELECT * FROM productos', (error, results, fields) => {
-      if (error) {
-        console.error('Database query error:', error);
-        res.status(500).json({ error: 'Internal Server Error' });
-        return;
-      }
-      res.json(results);
+        if (error) {
+            console.error('Database query error:', error);
+            res.status(500).json({ error: 'Internal Server Error' });
+            return;
+        }
+        res.json(results);
     });
-  });
+});
 
 app.get('/dataPventa', (req, res) => {
     db.query('SELECT * FROM productos WHERE cantidad > 0', (error, results, fields) => {
-      if (error) {
-        console.error('Database query error:', error);
-        res.status(500).json({ error: 'Internal Server Error' });
-        return;
-      }
-      res.json(results);
+        if (error) {
+            console.error('Database query error:', error);
+            res.status(500).json({ error: 'Internal Server Error' });
+            return;
+        }
+        res.json(results);
     });
-  });
+});
 
 app.get('/dataFaltantes', (req, res) => {
     const sql = 'SELECT * FROM productos WHERE cantidad < cantidad_minima';
     db.query(sql, (error, results, fields) => {
-      if (error) {
-        console.error('Database query error:', error);
-        res.status(500).json({ error: 'Internal Server Error' });
-        return;
-      }
-      res.json(results);
+        if (error) {
+            console.error('Database query error:', error);
+            res.status(500).json({ error: 'Internal Server Error' });
+            return;
+        }
+        res.json(results);
     });
-  });
+});
 
 app.get('/data_usuarios', (req, res) => {
     db.query('SELECT usuario, nombre, apellido_paterno, apellido_materno, rol, texto_plano, contrasena FROM Trabajadores,contrasenas WHERE encriptada=contrasena', (error, results, fields) => {
-      if (error) {
-        console.error('Database query error:', error);
-        res.status(500).json({ error: 'Internal Server Error' });
-        return;
-      }
-      res.json(results);
+        if (error) {
+            console.error('Database query error:', error);
+            res.status(500).json({ error: 'Internal Server Error' });
+            return;
+        }
+        res.json(results);
     });
-  });
+});
 
 app.get('/GetProducto/:codigo', (req, res) => {
     const codigo = req.params.codigo;
@@ -350,7 +351,7 @@ app.get('/GetUser', (req, res) => {
         const username = tokenDecoded.name;
 
         if (!username) {
-          return res.status(400).json({ Error: "Username not found in token" });
+            return res.status(400).json({ Error: "Username not found in token" });
         }
 
         const sql = 'SELECT usuario, nombre, apellido_paterno, rol FROM Trabajadores WHERE usuario = ?';
@@ -372,7 +373,7 @@ app.get('/GetUser', (req, res) => {
             const name = firstName + " " + lastName;
             const rol = user.rol;
             const username = user.usuario;
-            return res.json({ name,rol, username});
+            return res.json({ name, rol, username });
         });
 
     } catch (error) {
@@ -410,9 +411,9 @@ app.get('/generar-pdf', (req, res) => {
     const body = [['Producto', 'Cantidad', 'Código', 'Precio', 'Cantidad Mínima']];
     db.query('SELECT * FROM productos WHERE cantidad < cantidad_minima ', (error, results, fields) => {
         if (error) {
-          console.error('Database query error:', error);
-          res.status(500).json({ error: 'Internal Server Error' });
-          return;
+            console.error('Database query error:', error);
+            res.status(500).json({ error: 'Internal Server Error' });
+            return;
         }
         results.forEach(row => {
             body.push([
@@ -430,11 +431,11 @@ app.get('/generar-pdf', (req, res) => {
                     width: 530,
                     margin: [0, 0, 0, 20]
                 },
-                {text: 'Lista de Faltantes', style: 'header', alignment: 'center', margin: [0, 0, 0, 40]},
+                { text: 'Lista de Faltantes', style: 'header', alignment: 'center', margin: [0, 0, 0, 40] },
                 {
                     style: 'tableExample',
                     table: {
-                        widths: [95, 95, 95, 95,95],
+                        widths: [95, 95, 95, 95, 95],
                         body
                     }
                 }
@@ -464,7 +465,7 @@ app.get('/generar-pdf', (req, res) => {
         });
         pdfDoc.end();
         console.log('PDF generated and ready for download');
-      });
+    });
 })
 
 app.delete('/deleteUser/:usuario', (req, res) => {
@@ -516,16 +517,16 @@ app.post('/realizarCobro', async (req, res) => {
                             cantidad: cantidad_actual - producto.cantidad,
                         });
                     }
-                }else{
+                } else {
                     error = `Producto ${producto.nombre} sin existencias`;
                 }
-            }else{
+            } else {
                 return res.status(404).json({ Error: `Producto con código ${producto.codigo} no encontrado` });
             }
         }));
         if (error) {
             return res.json({ Error: error });
-        }else{
+        } else {
             console.log(faltantes)
             return res.status(200).json({
                 Status: "Exito",
@@ -575,8 +576,8 @@ app.post('/imprimir-ticket', (req, res) => {
                 }
             },
             { text: `Total: $${req.body.costo}`, style: 'header', alignment: 'center', margin: [0, 0, 0, 40] },
-            { text: `Pagó: $${req.body.pago}`,style: 'header', alignment: 'center', margin: [0, 0, 0, 40] },
-            { text: `Cambio: $${req.body.pago-req.body.costo}`, style: 'header', alignment: 'center', margin: [0, 0, 0, 40] },
+            { text: `Pagó: $${req.body.pago}`, style: 'header', alignment: 'center', margin: [0, 0, 0, 40] },
+            { text: `Cambio: $${req.body.pago - req.body.costo}`, style: 'header', alignment: 'center', margin: [0, 0, 0, 40] },
         ],
         styles: {
             header: {
@@ -599,7 +600,7 @@ app.post('/imprimir-ticket', (req, res) => {
     pdfDoc.end();
 });
 
-// ✅ RUTA PARA GENERAR CÓDIGO (Ya estaba, se mantiene)
+// ✅ RUTA PARA GENERAR CÓDIGO
 app.get('/api/productos/generar-codigo', (req, res) => {
     try {
         const codigo = Math.random().toString(36).substring(2, 10).toUpperCase();

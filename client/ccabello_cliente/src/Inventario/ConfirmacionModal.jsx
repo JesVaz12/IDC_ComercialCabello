@@ -12,7 +12,7 @@ function ConfirmacionModal({ closeModal, codigo }) {
 
     const handleDelete = async (codigo) => {
         try {
-            axios.delete(`http://alb-comercial-2000369602.us-east-2.elb.amazonaws.com/deleteProducto/${codigo}`).then(res => {
+            axios.delete(`http://alb-comercial-2000369602.us-east-2.elb.amazonaws.com:8080/deleteProducto/${codigo}`).then(res => {
                 if (res.status === 200) {
                     localStorage.setItem('showToast', 'Producto eliminado con éxito');
                     window.location.reload();
@@ -27,7 +27,7 @@ function ConfirmacionModal({ closeModal, codigo }) {
 
     useEffect(() => {
         if (codigo) {
-            axios.get(`http://alb-comercial-2000369602.us-east-2.elb.amazonaws.com/getProducto/${codigo}`)
+            axios.get(`http://alb-comercial-2000369602.us-east-2.elb.amazonaws.com:8080/getProducto/${codigo}`)
                 .then(res => {
                     if (res.data.Status === 'Exito') {
                         setValue({

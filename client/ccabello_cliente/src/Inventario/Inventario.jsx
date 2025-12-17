@@ -19,7 +19,6 @@ import PropTypes from 'prop-types';
 import ListaDeFaltantes from './ListaDeFaltantes';
 import toast, { Toaster } from 'react-hot-toast';
 
-
 class Inventario extends Component {
   constructor(props) {
     super(props);
@@ -29,6 +28,7 @@ class Inventario extends Component {
     this.sidenavmenu = createRef();
     this.state = {
       isAuthenticated: false,
+      searchTerm: '' // Inicializamos searchTerm para evitar errores de componente no controlado
     };
     this.openNavbar = this.openNavbar.bind(this);
     this.closeNavbar = this.closeNavbar.bind(this);
@@ -37,7 +37,12 @@ class Inventario extends Component {
 
   async componentDidMount() {
     console.log('Component Mounted, isAuthenticated prop:', this.state.isAuthenticated);
+
+    // Configuración global de credenciales para asegurar que la cookie viaje siempre
+    axios.defaults.withCredentials = true;
+
     await this.verifyUser();
+
     const message = localStorage.getItem('showToast');
     if (message) {
       toast.success(message);
@@ -47,18 +52,24 @@ class Inventario extends Component {
 
   async verifyUser() {
     try {
-      axios.defaults.withCredentials = true;
-      const res = await axios.get('http://alb-comercial-2000369602.us-east-2.elb.amazonaws.com/');
-      if (res.data.Status !== 'Exito') {
-        window.location.replace('/');
-        console.log(" notverified");
+      // CORRECCIÓN CRÍTICA:
+      // Cambiamos la ruta de '/' a '/login'.
+      // La ruta '/' es interceptada por el Frontend en el Balanceador de Carga.
+      // La ruta '/login' sí llega al Backend.
+      const res = await axios.get('http://alb-comercial-2000369602.us-east-2.elb.amazonaws.com:8080/');
 
-      } else {
+      // Verificamos si la respuesta es "Exito" O si el backend devuelve un usuario logueado
+      if (res.data.Status === 'Exito') {
         this.setState({ isAuthenticated: true });
-        console.log("verified");
+        console.log("✅ Verificado: Sesión activa");
+      } else {
+        console.log("❌ No verificado: Respuesta del servidor no es Exito", res.data);
+        window.location.replace('/');
       }
     } catch (error) {
       console.error('Error verifying user', error);
+      // Si falla la conexión o da error 404/500, asumimos que no hay sesión
+      window.location.replace('/');
     }
   }
 
@@ -76,7 +87,9 @@ class Inventario extends Component {
       this.storeButton.current.style.marginLeft = '28%';
       this.ui.current.onclick = this.closeNavbar;
       this.sleep(250).then(() => {
-        this.sidenavmenu.current.style.display = 'flex';
+        if (this.sidenavmenu.current) {
+          this.sidenavmenu.current.style.display = 'flex';
+        }
       });
       this.ui.current.style.opacity = '.5';
     }
@@ -88,7 +101,9 @@ class Inventario extends Component {
       this.sidenav.current.style.background = '#9B1313';
       this.storeButton.current.style.marginLeft = '10%';
       this.ui.current.onclick = null;
-      this.sidenavmenu.current.style.display = 'none';
+      if (this.sidenavmenu.current) {
+        this.sidenavmenu.current.style.display = 'none';
+      }
       document.body.style.backgroundColor = 'rgba(255, 255, 255, 0)';
       this.ui.current.style.opacity = '1';
     }
@@ -99,7 +114,6 @@ class Inventario extends Component {
   }
 
   render() {
-
     return (
       <>
         {
@@ -123,7 +137,6 @@ class Inventario extends Component {
                       </li>
                       <li className="menu-item" style={{ paddingLeft: "22px" }} onClick={this.closeNavbar}>
                         <img src={inventario_icon} className="imageIcon" alt="Inventario" style={{ width: "25%" }} /> <span>Inventario</span>
-
                       </li>
                       <li className="menu-item" style={{ paddingLeft: "19px" }} onClick={() => window.location.replace('/usuarios')} >
                         <img src={usuarios} className="imageIcon" alt="Messages" style={{ width: "25%" }} /> <span>Administración de Usuarios</span>
@@ -138,11 +151,11 @@ class Inventario extends Component {
               </div>
               <div className="ui" id="ui" ref={this.ui}>
                 <div id="header">
-                  <img src={inventario} id="logoInventario"></img>
+                  <img src={inventario} id="logoInventario" alt="Logo Inventario"></img>
                 </div>
                 <div id="headbar">
                   <div id="userinfo">
-                    <img src={usericon} />
+                    <img src={usericon} alt="User Icon" />
                     <div id="username">
                       <GetUser></GetUser>
                     </div>
@@ -164,15 +177,18 @@ class Inventario extends Component {
             </div>
           )
             :
-            <div>
+            // Puedes poner un spinner de carga aquí si quieres
+            <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100vh' }}>
+              <p>Verificando sesión...</p>
             </div>
         }
       </>
     );
   }
 }
+
 Inventario.propTypes = {
-  navigate: PropTypes.func.isRequired,
+  // navigate no se usa directamente en props aquí, pero lo dejo por compatibilidad si lo usas
 };
 
 export default Inventario;

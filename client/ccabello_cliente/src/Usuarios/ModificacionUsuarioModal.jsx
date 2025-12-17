@@ -106,7 +106,7 @@ function ModificacionUsuarioModal({ closeModal, usuario }) {
       const username = usuario.usuario;
       delete dataToUpdate.usuario; // No se puede modificar el username
 
-      await axios.put(`http://alb-comercial-2000369602.us-east-2.elb.amazonaws.com/usuarios/${username}`, dataToUpdate);
+      await axios.put(`http://alb-comercial-2000369602.us-east-2.elb.amazonaws.com:8080/usuarios/${username}`, dataToUpdate);
       alert('Usuario modificado correctamente');
       closeModal();
     } catch (error) {

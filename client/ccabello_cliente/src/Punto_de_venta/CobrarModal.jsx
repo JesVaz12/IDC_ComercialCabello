@@ -42,18 +42,18 @@ function CobrarModal({ closeModal, data }) {
     // Triggered after successful API call
     const realizarCobro = () => {
         let username = '';
-        axios.get('http://alb-comercial-2000369602.us-east-2.elb.amazonaws.com/GetUser', { withCredentials: true })
+        axios.get('http://alb-comercial-2000369602.us-east-2.elb.amazonaws.com:8080/GetUser', { withCredentials: true })
             .then(response => {
                 username = response.data.username;
             }).then(() => {
                 if (pago >= costo) {
-                    axios.post('http://alb-comercial-2000369602.us-east-2.elb.amazonaws.com/realizarCobro', { pago, costo, data, username })
+                    axios.post('http://alb-comercial-2000369602.us-east-2.elb.amazonaws.com:8080/realizarCobro', { pago, costo, data, username })
                         .then(res => {
                             if (res.data.Status === 'Exito') {
                                 const faltantes = res.data.Faltantes;
                                 const payload = { pago, costo, data };
                                 localStorage.setItem('showToast', 'Venta exitosa');
-                                axios.post('http://alb-comercial-2000369602.us-east-2.elb.amazonaws.com/imprimir-ticket', payload, {
+                                axios.post('http://alb-comercial-2000369602.us-east-2.elb.amazonaws.com:8080/imprimir-ticket', payload, {
                                     responseType: 'blob'
                                 }).then((response) => {
                                     const url = window.URL.createObjectURL(new Blob([response.data], { type: 'application/pdf' }));

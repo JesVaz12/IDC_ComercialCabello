@@ -80,7 +80,7 @@ function EliminarUsuarioModal({ closeModal, usuario }) {
 
   const handleConfirmDelete = async () => {
     try {
-      await axios.delete(`http://alb-comercial-2000369602.us-east-2.elb.amazonaws.com/deleteUsuario/${usuario.usuario}`, {
+      await axios.delete(`http://alb-comercial-2000369602.us-east-2.elb.amazonaws.com:8080/deleteUsuario/${usuario.usuario}`, {
         withCredentials: true
       });
       alert('Usuario eliminado correctamente');

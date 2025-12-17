@@ -56,9 +56,9 @@ class Pventa extends Component {
   async verifyUser() {
     try {
       axios.defaults.withCredentials = true;
-      const res = await axios.get('http://alb-comercial-2000369602.us-east-2.elb.amazonaws.com/');
+      // ✅ CORRECCIÓN: Se agregó el puerto :8080
+      const res = await axios.get('http://alb-comercial-2000369602.us-east-2.elb.amazonaws.com:8080/');
 
-      // --> LÍNEA AÑADIDA PARA DEPURACIÓN <--
       console.log('Datos recibidos del servidor:', res.data);
 
       if (res.data.Status !== 'Exito') {
@@ -66,11 +66,13 @@ class Pventa extends Component {
       } else {
         this.setState({
           isAuthenticated: true,
-          rol: res.data.rol // Guardamos el rol del usuario en el estado
+          rol: res.data.rol
         });
       }
     } catch (error) {
       console.error('Error verifying user', error);
+      // Si falla, redirigir al home/login
+      window.location.replace('/');
     }
   }
 
@@ -107,8 +109,6 @@ class Pventa extends Component {
   }
 
   render() {
-    // Decisión basada en el rol del usuario.
-    // Asegúrate de que la palabra 'operario' coincida exactamente con lo que ves en la consola.
     const mostrarReloj = this.state.rol === 'Operario';
 
     return (
@@ -158,7 +158,6 @@ class Pventa extends Component {
                       <GetUser />
                     </div>
 
-                    {/* El Feature Flag ahora obedece al rol del usuario */}
                     {mostrarReloj && (
                       <div style={{ marginLeft: '20px', color: 'black' }}>
                         <Reloj />

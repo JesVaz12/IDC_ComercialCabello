@@ -13,7 +13,7 @@ function RegisterUser() {
     })
     const handleSubmit = (event) => {
         event.preventDefault();
-        axios.post('http://alb-comercial-2000369602.us-east-2.elb.amazonaws.com/register_user', values)
+        axios.post('http://alb-comercial-2000369602.us-east-2.elb.amazonaws.com:8080/register_user', values)
             .then(res => console.log(res))
             .then(err => console.log(err));
     }

@@ -48,7 +48,9 @@ class Admin_usuarios extends Component {
   async verifyUser() {
     try {
       axios.defaults.withCredentials = true;
-      const res = await axios.get('http://alb-comercial-2000369602.us-east-2.elb.amazonaws.com/');
+      // ✅ CORRECCIÓN: Se agregó el puerto :8080
+      const res = await axios.get('http://alb-comercial-2000369602.us-east-2.elb.amazonaws.com:8080/');
+
       if (res.data.Status !== 'Exito') {
         window.location.replace('/');
         console.log(" notverified");
@@ -60,6 +62,7 @@ class Admin_usuarios extends Component {
       }
     } catch (error) {
       console.error('Error verifying user', error);
+      window.location.replace('/');
     }
   }
 

@@ -60,7 +60,8 @@ function DataTableComponent({ searchTerm }) {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const response = await axios.get('http://alb-comercial-2000369602.us-east-2.elb.amazonaws.com/data');
+        // ✅ CORRECCIÓN CRÍTICA: Se agregó el puerto :8080 aquí abajo
+        const response = await axios.get('http://alb-comercial-2000369602.us-east-2.elb.amazonaws.com:8080/data');
         setData(response.data);
         setFilteredData(response.data);
       } catch (error) {

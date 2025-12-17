@@ -22,7 +22,7 @@ function DataTableComponentFaltantes() {
   useEffect(() => {
     async function fetchData() {
       try {
-        const response = await axios.get('http://alb-comercial-2000369602.us-east-2.elb.amazonaws.com/dataFaltantes');
+        const response = await axios.get('http://alb-comercial-2000369602.us-east-2.elb.amazonaws.com:8080/dataFaltantes');
         const processedData = response.data.map((item) => ({
           ...item,
           cantidad: parseInt(item.cantidad, 10),

@@ -26,7 +26,7 @@ function TablaFaltantes({ faltantes }) {
 
   /*  const handleDelete = async (codigo) => {
       try {
-        axios.delete(`http://alb-comercial-2000369602.us-east-2.elb.amazonaws.com/deleteProducto/${codigo}`);
+        axios.delete(`http://alb-comercial-2000369602.us-east-2.elb.amazonaws.com:8080/deleteProducto/${codigo}`);
         setData(data.filter((row) => row.codigo !== codigo));
       } catch (error) {
         console.error('Error deleting data:', error);

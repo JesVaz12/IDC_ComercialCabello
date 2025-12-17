@@ -32,7 +32,7 @@ function AltaUsuariosModal({ closeModal }) {
                 document.getElementById("passerror").removeAttribute("open");
             }
             console.log(values);
-            axios.post('http://alb-comercial-2000369602.us-east-2.elb.amazonaws.com/register_user', values)
+            axios.post('http://alb-comercial-2000369602.us-east-2.elb.amazonaws.com:8080/register_user', values)
                 .then(res => {
                     console.log(res.status)
                     if (res.status === 200) {
