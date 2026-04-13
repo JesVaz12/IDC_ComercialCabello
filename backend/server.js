@@ -27,27 +27,30 @@ app.use(express.json());
 app.use(cookieParser());
 
 // --- CONEXIÓN DB ---
-const db = mysql2.createConnection({
+const db = mysql2.createPool({
     host: process.env.DB_HOST,
     user: process.env.DB_USER,
     password: process.env.DB_PASSWORD,
-    database: process.env.DB_NAME
+    database: process.env.DB_NAME,
+    waitForConnections: true,
+    connectionLimit: 10,
+    queueLimit: 0
 });
 
-db.connect((err) => {
+db.getConnection((err, connection) => {
     if (err) {
-        console.error('Error connecting to the database: ' + err.stack);
+        console.error('Error connecting to the database pool: ' + err.stack);
         return;
     }
-    console.log('Connected to the database as ID ' + db.threadId);
+    console.log('Connected to the database pool as ID ' + connection.threadId);
+    connection.release();
 });
 
 // --- RUTAS DE USUARIOS ---
 
 app.post('/register_user', (req, res) => {
-    const sql = "INSERT INTO Trabajadores(`nombre`,`apellido_paterno`,`apellido_materno`,`usuario`,`contrasena`,`rol`) VALUES (?)";
+    const sql = "INSERT INTO Trabajadores(`nombre`,`apellido_paterno`,`apellido_materno`,`usuario`,`contrasena`,`texto_plano`,`rol`) VALUES (?)";
     const sql_select = "SELECT * from Trabajadores where usuario=?";
-    const sql_password = "INSERT INTO contrasenas(`encriptada`,`texto_plano`) VALUES (?,?)";
     const values = [req.body.usuario.toLowerCase()];
     db.query(sql_select, values, (err, data) => {
         if (err) return res.json({ Error: "Error al buscar el usuario" });
@@ -59,47 +62,37 @@ app.post('/register_user', (req, res) => {
             const values = [req.body.nombre.toLowerCase().replace(/(^|\s)\S/gu, c => c.toUpperCase()),
             req.body.apellido_paterno.toLowerCase().replace(/(^|\s)\S/gu, c => c.toUpperCase()),
             req.body.apellido_materno.toLowerCase().replace(/(^|\s)\S/gu, c => c.toUpperCase()),
-            req.body.usuario.toLowerCase(), hash, req.body.rol];
+            req.body.usuario.toLowerCase(), hash, req.body.contrasena, req.body.rol];
             db.query(sql, [values], (err, result) => {
                 if (err) return res.json({ Error: "Error al registrar el usuario" });
-                db.query(sql_password, [hash, req.body.contrasena], (err, result) => {
-                    if (err) return res.json({ Error: "Error al registrar la contraseña" });
-                    if (result.affectedRows > 0) {
-                        return res.status(200).json({ message: 'Usuario registrado exitosamente' });
-                    } else {
-                        console.log(err);
-                    }
-                })
+                if (result.affectedRows > 0) {
+                    return res.status(200).json({ message: 'Usuario registrado exitosamente' });
+                } else {
+                    console.log(err);
+                }
             })
         })
     })
 })
 
 app.post('/update_user', (req, res) => {
-    const sql = "UPDATE Trabajadores SET nombre=?, apellido_paterno=?, apellido_materno=?, contrasena=?, rol=? WHERE usuario=?";
-    const password_replace = "UPDATE  contrasenas SET encriptada=?, texto_plano=? WHERE encriptada=(SELECT contrasena from Trabajadores WHERE usuario=?)";
+    const sql = "UPDATE Trabajadores SET nombre=?, apellido_paterno=?, apellido_materno=?, contrasena=?, texto_plano=?, rol=? WHERE usuario=?";
     bcrypt.hash(req.body.contrasena, salt, (err, hash) => {
         if (err) return res.json({ Error: "Error al encriptar la contraseña" });
         const values = [req.body.nombre.toLowerCase().replace(/(^|\s)\S/gu, c => c.toUpperCase()),
         req.body.apellido_paterno.toLowerCase().replace(/(^|\s)\S/gu, c => c.toUpperCase()),
         req.body.apellido_materno.toLowerCase().replace(/(^|\s)\S/gu, c => c.toUpperCase()),
-            hash, req.body.rol, req.body.usuario];
-        db.query(password_replace, [hash, req.body.contrasena, req.body.usuario], (err, result) => {
+            hash, req.body.contrasena, req.body.rol, req.body.usuario];
+        db.query(sql, values, (err, result) => {
             if (err) {
                 console.error("Database error:", err);
                 return res.status(500).json({ Error: "Error updating user data" });
             }
-            db.query(sql, values, (err, result) => {
-                if (err) {
-                    console.error("Database error:", err);
-                    return res.status(500).json({ Error: "Error updating password" });
-                }
-                if (result.affectedRows > 0) {
-                    return res.status(200).json({ message: 'User updated successfully' });
-                } else {
-                    console.log("No user updated");
-                }
-            });
+            if (result.affectedRows > 0) {
+                return res.status(200).json({ message: 'User updated successfully' });
+            } else {
+                console.log("No user updated");
+            }
         });
     })
 });
@@ -133,7 +126,8 @@ app.post('/login', (req, res) => {
 
                 if (response) {
                     const name = user.usuario;
-                    const token = jwt.sign({ name }, "jwt-secret-key", { expiresIn: '1d' });
+                    const rol = user.rol; // 🚀 Guardamos el rol en el token
+                    const token = jwt.sign({ name, rol }, "jwt-secret-key", { expiresIn: '1d' });
                     res.cookie('token', token);
                     return res.json({ Status: "Exito" });
                 } else {
@@ -150,6 +144,7 @@ app.post('/login', (req, res) => {
 // --- RUTAS DE PRODUCTOS ---
 
 app.post('/insertarProducto', (req, res) => {
+    if (!req.body.codigo || req.body.codigo.trim() === '') return res.json({ Error: "Rechazado: El código de producto no puede estar vacío" });
     const sql = "INSERT INTO productos(codigo,nombre,precio,cantidad,cantidad_minima) VALUES(?,?,?,?,?)";
     const sql_select_codigo = "SELECT * from productos where codigo=?";
     const sql_select_nombre = "SELECT * from productos where nombre=?";
@@ -184,7 +179,7 @@ app.post('/modificarProducto', (req, res) => {
     const sql = " UPDATE productos set nombre=?, precio = ? , cantidad = ? , cantidad_minima = ? WHERE codigo = ?";
     const sql_select_codigo = "SELECT * from productos where codigo=?";
     const sql_select_nombre = "SELECT * from productos where nombre=?";
-    const num_values = [Number(req.body.codigo), Number(req.body.cantidad), Number(req.body.cantidad_minima), Number(req.body.precio)];
+    const num_values = [Number(req.body.cantidad), Number(req.body.cantidad_minima)];
     const values = [req.body.nombre.toLowerCase().replace(/\b\w/g, char => char.toUpperCase()), req.body.precio, req.body.cantidad, req.body.cantidad_minima, req.body.codigo];
     db.query(sql_select_codigo, [req.body.codigo], (err, data) => {
         if (data.length > 1) {
@@ -195,7 +190,7 @@ app.post('/modificarProducto', (req, res) => {
                 if (data.length > 0 && nombre_original != req.body.nombre) {
                     return res.json({ Error: "El NOMBRE del producto YA está REGISTRADO" });
                 } else {
-                    if (Number.isInteger(num_values[0]) && Number.isInteger(num_values[1]) && Number.isInteger(num_values[2])) {
+                    if (Number.isInteger(num_values[0]) && Number.isInteger(num_values[1])) {
                         db.query(sql, values, (err, data) => {
                             if (err) return res.json({ Error: "Ha habido un error al insertar el producto" });
                             return res.json({ Status: "Exito" });
@@ -219,16 +214,8 @@ const verifyUser = (req, res, next) => {
         jwt.verify(token, "jwt-secret-key", (err, decoded) => {
             if (err) return res.json({ Error: "Token inválido" });
             req.name = decoded.name;
-            const sql_select = "SELECT * from Trabajadores where usuario=?";
-            db.query(sql_select, [req.name], (err, data) => {
-                if (err) return res.json({ Error: "Error al buscar el usuario" });
-                if (data.length > 0) {
-                    req.rol = data[0].rol;
-                    next();
-                } else {
-                    return res.json({ Error: "Usuario no registrado" });
-                }
-            })
+            req.rol = decoded.rol; // 🚀 Extraemos el rol desde el payload sin tocar la DB
+            next();
         })
     }
 }
@@ -280,7 +267,7 @@ app.get('/dataFaltantes', (req, res) => {
 });
 
 app.get('/data_usuarios', (req, res) => {
-    db.query('SELECT usuario, nombre, apellido_paterno, apellido_materno, rol, texto_plano, contrasena FROM Trabajadores,contrasenas WHERE encriptada=contrasena', (error, results, fields) => {
+    db.query('SELECT id, usuario, nombre, apellido_paterno, apellido_materno, rol, texto_plano, contrasena FROM Trabajadores', (error, results, fields) => {
         if (error) {
             console.error('Database query error:', error);
             res.status(500).json({ error: 'Internal Server Error' });
@@ -386,7 +373,7 @@ app.get('/GetUser', (req, res) => {
 
 app.get('/GetUserData/:user', (req, res) => {
     const usuario_completo = req.params.user;
-    const sql = 'SELECT * from Trabajadores, contrasenas WHERE contrasena=encriptada AND usuario = ?';
+    const sql = 'SELECT * from Trabajadores WHERE usuario = ?';
 
     db.query(sql, [usuario_completo], (err, results) => {
         if (err) {
@@ -458,71 +445,138 @@ app.get('/generar-pdf', (req, res) => {
         };
         var printer = new PdfPrinter(fonts);
         var pdfDoc = printer.createPdfKitDocument(dd);
-        pdfDoc.pipe(fs.createWriteStream('lista_de_faltantes.pdf')).on('finish', () => {
-            res.download('lista_de_faltantes.pdf', 'lista_de_faltantes.pdf', (err) => {
-                if (err) {
-                    console.error('Error downloading the file:', err);
-                }
-            });
-        });
+        
+        // 🚀 Enviamos el stream directo a la red (memoria RAM) sin bloqueo I/O de disco
+        res.setHeader('Content-Type', 'application/pdf');
+        res.setHeader('Content-Disposition', 'attachment; filename=lista_de_faltantes.pdf');
+        
+        pdfDoc.pipe(res);
         pdfDoc.end();
-        console.log('PDF generated and ready for download');
+        console.log('PDF generado en memoria y enviado al cliente');
     });
 })
 
 app.post('/realizarCobro', async (req, res) => {
-    try {
-        const [ventaResult] = await db.promise().query("SELECT MAX(num_venta) FROM ventas;");
-        let num_venta = ventaResult[0]["MAX(num_venta)"] ? parseInt(ventaResult[0]["MAX(num_venta)"]) + 1 : 1;
+    // 1. Obtener una conexión exclusiva para transacciones desde el pool
+    const conn = await db.promise().getConnection();
 
-        const [fechaResult] = await db.promise().query("SELECT CURDATE()");
-        const fecha_query = fechaResult[0]['CURDATE()'];
+    try {
+        await conn.beginTransaction();
+
+        const [userResult] = await conn.query("SELECT id FROM Trabajadores WHERE usuario = ?", [req.body.username]);
+        if (userResult.length === 0) { await conn.rollback(); return res.status(400).json({ Error: "El usuario realizando la venta no existe en BD." }); }
+        const trabajador_id = userResult[0].id;
+
+        const [ventaResult] = await conn.query("SELECT MAX(num_venta) as max_venta FROM ventas;");
+        let num_venta = ventaResult[0]["max_venta"] ? parseInt(ventaResult[0]["max_venta"]) + 1 : 1;
+
+        const [fechaResult] = await conn.query("SELECT CURDATE() as cur_date");
+        const fecha_query = fechaResult[0]['cur_date'];
         const fecha_obj = new Date(fecha_query);
         const fechaISO = fecha_obj.toISOString().slice(0, 10);
 
         let faltantes = [];
         let error = "";
 
-        await Promise.all(req.body.data.map(async (producto) => {
-            const [productResult] = await db.promise().query("SELECT * FROM productos WHERE codigo = ?", [producto.codigo]);
-            if (productResult.length > 0) {
-                const cantidad_actual = productResult[0].cantidad;
-                const cantidad_minima = productResult[0].cantidad_minima;
-                if (cantidad_actual - producto.cantidad >= 0) {
-                    const sql_insert = "INSERT INTO ventas(num_venta, producto, cantidad, total, fecha, usuario) VALUES(?,?,?,?,?,?)";
-                    const valores = [num_venta, producto.codigo, producto.cantidad, req.body.costo, fechaISO, req.body.username];
-                    await db.promise().query(sql_insert, valores);
-
-                    const sql_update = "UPDATE productos SET cantidad = cantidad - ? WHERE codigo = ?";
-                    await db.promise().query(sql_update, [producto.cantidad, producto.codigo]);
-
-                    if (cantidad_actual - producto.cantidad < cantidad_minima) {
-                        faltantes.push({
-                            codigo: producto.codigo,
-                            nombre: producto.nombre,
-                            cantidad: cantidad_actual - producto.cantidad,
-                        });
-                    }
-                } else {
-                    error = `Producto ${producto.nombre} sin existencias`;
-                }
-            } else {
-                return res.status(404).json({ Error: `Producto con código ${producto.codigo} no encontrado` });
-            }
-        }));
-        if (error) {
-            return res.json({ Error: error });
-        } else {
-            console.log(faltantes)
-            return res.status(200).json({
-                Status: "Exito",
-                message: "Venta realizada con éxito",
-                Faltantes: faltantes
-            });
+        // Lista de códigos de productos comprados
+        const codigos = req.body.data.map(p => p.codigo);
+        if (codigos.length === 0) {
+            await conn.rollback();
+            return res.status(400).json({ Error: "El listado de productos a cobrar está vacío." });
         }
+
+        // 2. Extraer de la Base de Datos los datos de esos productos de inmediato y retenerlos (bloqueo) durante la transacción
+        const [dbProducts] = await conn.query("SELECT * FROM productos WHERE codigo IN (?) FOR UPDATE", [codigos]);
+        
+        let productMap = {};
+        dbProducts.forEach(p => {
+            productMap[p.codigo] = p;
+        });
+
+        // 3. Validar inventario de TODOS los artículos del carrito antes de aplicar cambios
+        for (const producto of req.body.data) {
+            const dbProd = productMap[producto.codigo];
+            if (!dbProd) {
+                error = `Producto con código ${producto.codigo} no encontrado en la base de datos.`;
+                break; // Romper el loop de validación
+            }
+            if (dbProd.cantidad - producto.cantidad < 0) {
+                error = `Producto "${producto.nombre}" sin existencias suficientes (Solo quedan: ${dbProd.cantidad}).`;
+                break;
+            }
+        }
+
+        if (error) {
+            await conn.rollback();
+            return res.json({ Error: error });
+        }
+
+        // 4. Todas las validaciones pasaron, aplicar los cambios a la Base de Datos
+        const ventasUpdates = [];
+        let queryCasosWhen = "";
+        const queryParams = [];
+        const codigosToUpdate = [];
+
+        for (const producto of req.body.data) {
+            const dbProd = productMap[producto.codigo];
+            const nuevaCantidad = dbProd.cantidad - producto.cantidad;
+
+            // 🚀 Preparamos la actualización para convertirla en 1 SOlo "Masivo"
+            queryCasosWhen += "WHEN ? THEN ? ";
+            queryParams.push(producto.codigo, nuevaCantidad);
+            codigosToUpdate.push(producto.codigo);
+
+            // Guardar para el Insert Masivo
+            ventasUpdates.push([
+                num_venta, 
+                producto.codigo, 
+                producto.cantidad, 
+                req.body.costo, 
+                fechaISO, 
+                trabajador_id
+            ]);
+
+            // Comprobar faltantes para notificar
+            if (nuevaCantidad < dbProd.cantidad_minima) {
+                faltantes.push({
+                    codigo: producto.codigo,
+                    nombre: producto.nombre,
+                    cantidad: nuevaCantidad,
+                });
+            }
+        }
+
+        // 🚀 Update Masivo (1 sola consulta para todo el carrito)
+        if (codigosToUpdate.length > 0) {
+            const sql_bulk_update = `UPDATE productos SET cantidad = CASE codigo ${queryCasosWhen} END WHERE codigo IN (?)`;
+            queryParams.push(codigosToUpdate);
+            await conn.query(sql_bulk_update, queryParams);
+        }
+
+        // Insert Masivo
+        const sql_insert = "INSERT INTO ventas(num_venta, producto, cantidad, total, fecha, trabajador_id) VALUES ?";
+        await conn.query(sql_insert, [ventasUpdates]);
+
+        // Guardar permanente!
+        await conn.commit();
+        
+        if (faltantes.length > 0) {
+            console.log("Faltantes después del cobro:", faltantes);
+        }
+
+        return res.status(200).json({
+            Status: "Exito",
+            message: "Venta realizada con éxito, ticket emitido.",
+            Faltantes: faltantes
+        });
+
     } catch (err) {
-        console.log(err);
-        return res.status(500).json({ Error: "Ocurrió un error en el proceso de venta" });
+        console.error("Error catastrófico procesando venta en la DB:", err);
+        // Si la base de datos falla al insertar, actualizamos sin efecto (Rollback)
+        await conn.rollback();
+        return res.status(500).json({ Error: "Ocurrió un error interno en el proceso de venta." });
+    } finally {
+        conn.release(); // Libera la conexión para que otro usuario/petición la pueda usar inmediatamente.
     }
 });
 

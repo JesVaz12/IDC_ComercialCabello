@@ -78,7 +78,10 @@ function CobrarModal({ closeModal, data}) {
                                   toast.error(res.data.Error);
                               }
                           })
-                          .catch(err => console.log(err));
+                          .catch(err => {
+                              toast.error('Error de servidor: ' + (err.response ? (err.response.data.Error || err.response.statusText) : err.message));
+                              console.log(err);
+                          });
                   } else {
                       toast.error('MONTO INSUFICIENTE');
                   }

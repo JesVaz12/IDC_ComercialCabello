@@ -87,7 +87,7 @@ function DataTableComponent({searchTerm}) {
             const data_response = Array.isArray(response.data) ? response.data : [response.data];
             const processedData = data_response.map((item) => ({
                 nombre: item.Producto.nombre,
-                codigo: parseInt(item.Producto.codigo, 10),
+                codigo: String(item.Producto.codigo),
                 cantidad: parseInt(1, 10), 
                 precio: parseFloat(item.Producto.precio), 
                 inventario: parseInt(item.Producto.cantidad, 10),

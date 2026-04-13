@@ -4,7 +4,7 @@ import axios from 'axios';
 import PropTypes from 'prop-types';
 import modIcon from '../assets/inventario/modIcon.svg';
 
-import ModificacionUsuarioModal from './ModificacionUsuarioModal.jsx';
+import ModificacionUsuariosModal from './ModificacionUsuariosModal.jsx';
 import EliminarUsuarioModal from './EliminarUsuarioModal.jsx';
 
 function DataTableComponent({ searchTerm }) {
@@ -138,7 +138,7 @@ function DataTableComponent({ searchTerm }) {
         paginationRowsPerPageOptions={[5, 10, 15, 20, 25, 30]}
       />
 
-      {openModal && <ModificacionUsuarioModal closeModal={() => setOpenModal(false)} usuario={selectedUsuario} />}
+      {openModal && <ModificacionUsuariosModal closeModal={() => setOpenModal(false)} usuario={selectedUsuario.usuario} />}
       {openModalDelete && <EliminarUsuarioModal closeModal={() => setOpenModalDelete(false)} usuario={selectedUsuario} />}
     </>
   );

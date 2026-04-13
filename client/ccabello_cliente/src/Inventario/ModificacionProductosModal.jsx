@@ -180,7 +180,7 @@ function ModificacionProductosModal({ closeModal, codigo}) {
                             </div>
                             <div id='buttons'>
                                 <button id='acceptButton' type='submit'>Aceptar</button>
-                                <button id='cancelButton' onClick={() => closeModal(false)}>Cancelar</button>
+                                <button type='button' id='cancelButton' onClick={() => closeModal(false)}>Cancelar</button>
                             </div>
                         </form>
                     </div>
