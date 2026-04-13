@@ -78,8 +78,8 @@ function DataTableComponent({ searchTerm }) {
       return;
     }
     
-    if (searchTerm && searchTerm.value !== undefined && searchTerm.value !== null) {
-      const busqueda = searchTerm.value;
+    if (searchTerm) {
+      const busqueda = typeof searchTerm === 'string' ? searchTerm : (searchTerm.value || '');
       const filtered = data.filter((row) =>
         (row.nombre && row.nombre.toLowerCase().includes(busqueda.toLowerCase())) ||
         (row.codigo && String(row.codigo).toLowerCase().includes(busqueda.toLowerCase()))
