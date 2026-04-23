@@ -5,7 +5,7 @@ Este proyecto es un sistema de software desarrollado para la tienda de abarrotes
 
 Toda la aplicación de punto de venta se ejecuta completamente dentro de contenedores de Docker, lo que garantiza un entorno de desarrollo consistente, automatizado y fácil de desplegar. El sistema fue diseñado bajo la metodología Rational Unified Process (RUP), asegurando un desarrollo iterativo, escalable y con pruebas exhaustivas en cada fase.
 
-## 🎯 Propósito
+## Propósito
 
 * Mejorar el control del inventario de productos.
 * Agilizar el proceso de ventas mediante un punto de venta.
@@ -13,14 +13,14 @@ Toda la aplicación de punto de venta se ejecuta completamente dentro de contene
 * Administrar usuarios y roles con distintos permisos de acceso.
 * Ofrecer una interfaz intuitiva para empleados y administradores.
 
-## 💻 Tecnologías Utilizadas
+## Tecnologías Utilizadas
 
 * **Frontend:** React
 * **Backend:** Node.js
 * **Base de Datos:** MySQL
 * **Infraestructura:** Docker & Docker Compose
 
-## ✨ Funcionalidades Principales
+## Funcionalidades Principales
 
 * **Seguridad:** Login y control de acceso.
 * **Gestión de Inventario:** Alta, baja, modificación, búsqueda y lista de faltantes.
@@ -29,7 +29,7 @@ Toda la aplicación de punto de venta se ejecuta completamente dentro de contene
 
 ---
 
-## 🚀 Prerrequisitos
+## Prerrequisitos
 
 Para ejecutar este proyecto, solo necesitas tener instalado lo siguiente en tu computadora:
 
@@ -41,7 +41,7 @@ Para ejecutar este proyecto, solo necesitas tener instalado lo siguiente en tu c
 
 ---
 
-## 🛠️ Pasos de Instalación y Ejecución
+## Pasos de Instalación y Ejecución
 
 ### 1. Clona el Repositorio
 Abre una terminal y clona el proyecto desde GitHub:
