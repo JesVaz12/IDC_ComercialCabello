@@ -1,31 +1,38 @@
-# Node.js
+# =========================
+# Dependencias
+# =========================
 node_modules/
+.npm
 
-# Logs
-logs
+# =========================
+# Logs y PIDs
+# =========================
+logs/
 *.log
 npm-debug.log*
-
-# Dependency directories
-pids
-logs
+yarn-debug.log*
+yarn-error.log*
+pids/
 *.pid
 *.seed
 *.pid.lock
 
-# Optional npm cache directory
-.npm
-
-# Optional eslint cache
-.eslintcache
-
-# Optional REPL history
-.node_repl_history
-
-# Environment variables
-.env*.DS_Store
-
+# =========================
+# Variables de Entorno y Secretos
+# =========================
 .env
+.env.*
+!.env.example
 
+# =========================
+# Archivos del Sistema Operativo
+# =========================
 .DS_Store
 **/.DS_Store
+Thumbs.db
+
+# =========================
+# Caché y Herramientas
+# =========================
+.eslintcache
+.node_repl_history

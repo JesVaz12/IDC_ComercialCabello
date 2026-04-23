@@ -127,8 +127,12 @@ app.post('/login', (req, res) => {
                 if (response) {
                     const name = user.usuario;
                     const rol = user.rol; // 🚀 Guardamos el rol en el token
-                    const token = jwt.sign({ name, rol }, "jwt-secret-key", { expiresIn: '1d' });
-                    res.cookie('token', token);
+                    const token = jwt.sign({ name, rol }, process.env.JWT_SECRET, { expiresIn: '1d' });
+                    res.cookie('token', token, {
+                        httpOnly: true,
+                        secure: process.env.NODE_ENV === 'production',
+                        sameSite: 'lax',
+                    });
                     return res.json({ Status: "Exito" });
                 } else {
                     return res.json({ Error: "Contraseña incorrecta" });
@@ -211,7 +215,7 @@ const verifyUser = (req, res, next) => {
     if (!token) {
         return res.json({ Error: "No estás autenticado" });
     } else {
-        jwt.verify(token, "jwt-secret-key", (err, decoded) => {
+        jwt.verify(token, process.env.JWT_SECRET, (err, decoded) => {
             if (err) return res.json({ Error: "Token inválido" });
             req.name = decoded.name;
             req.rol = decoded.rol; // 🚀 Extraemos el rol desde el payload sin tocar la DB
@@ -267,7 +271,7 @@ app.get('/dataFaltantes', (req, res) => {
 });
 
 app.get('/data_usuarios', (req, res) => {
-    db.query('SELECT id, usuario, nombre, apellido_paterno, apellido_materno, rol, texto_plano, contrasena FROM Trabajadores', (error, results, fields) => {
+    db.query('SELECT id, usuario, nombre, apellido_paterno, apellido_materno, rol FROM Trabajadores', (error, results, fields) => {
         if (error) {
             console.error('Database query error:', error);
             res.status(500).json({ error: 'Internal Server Error' });
