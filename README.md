@@ -45,13 +45,15 @@ Para ejecutar este proyecto, solo necesitas tener instalado lo siguiente en tu c
 
 ### 1. Clona el Repositorio
 Abre una terminal y clona el proyecto desde GitHub:
-```bash
+```bash 
 git clone [https://github.com/JesVaz12/IDC_ComercialCabello.git](https://github.com/JesVaz12/IDC_ComercialCabello.git)
 cd IDC_ComercialCabello
+```
 2. Configura las Variables de Entorno
 Crea un archivo llamado .env en la raíz del proyecto y agrega las credenciales necesarias (solicita las contraseñas base al administrador del repositorio):
 
 Fragmento de código
+```bash
 MYSQL_ROOT_PASSWORD=TuContraseñaSegura
 DB_PASSWORD=TuContraseñaSegura
 DB_USER=root
@@ -59,11 +61,14 @@ DB_NAME=comercial_cabello
 STAGING_DB_PASSWORD=TuContraseñaSegura
 JWT_SECRET=TuFirmaSecretaJWT
 NODE_ENV=development
+```
+
 3. Levanta los Contenedores
 Ejecuta el siguiente comando. Docker descargará las imágenes, instalará las dependencias de React y Node, creará la base de datos y levantará los servidores automáticamente:
 
-Bash
+```bash
 docker-compose up --build
+```
 (Nota: La primera vez puede tardar unos minutos mientras se construyen las imágenes y se importan los datos iniciales de MySQL).
 
 4. ¡Listo!
@@ -73,16 +78,19 @@ Una vez que la terminal indique que los servidores están conectados, abre tu na
 🛑 Comandos Útiles
 Para detener la aplicación y apagar los contenedores:
 
-Bash
+```bash 
 docker-compose down
+```
 Para reiniciar la aplicación rápidamente (sin reconstruir dependencias):
 
-Bash
+```bash 
 docker-compose up
+```
 Para apagar y limpiar la base de datos (restablecer de fábrica):
 
-Bash
+```bash 
 docker-compose down -v
+```
 
 ***
 
