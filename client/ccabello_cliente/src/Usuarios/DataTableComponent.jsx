@@ -45,7 +45,7 @@ function DataTableComponent({ searchTerm }) {
         // --- INICIO DE LA CORRECCIÓN (Error 403) ---
         // ---
         // Añadimos 'withCredentials: true' para que axios envíe la cookie de login
-        const response = await axios.get('http://localhost:8080/data_usuarios', { 
+        const response = await axios.get('http://localhost:8081/data_usuarios', { 
           withCredentials: true 
         }); 
         // ---

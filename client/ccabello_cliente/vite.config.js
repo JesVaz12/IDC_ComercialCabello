@@ -7,7 +7,13 @@ export default defineConfig({
     environment: 'jsdom',
     setupFiles: './src/setupTests.js',
   },
-  // AÑADE ESTE BLOQUE
+  server: {
+    watch: {
+      usePolling: true,
+    },
+    host: true,
+    port: 5174,
+  },
   define: {
     'process.env': {}
   }

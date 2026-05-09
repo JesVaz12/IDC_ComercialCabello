@@ -80,7 +80,7 @@ function EliminarUsuarioModal({ closeModal, usuario }) {
 
   const handleConfirmDelete = async () => {
     try {
-      await axios.delete(`http://localhost:8080/deleteUsuario/${usuario.usuario}`, {
+      await axios.delete(`http://localhost:8081/deleteUsuario/${usuario.usuario}`, {
         withCredentials: true 
       });
       alert('Usuario eliminado correctamente');

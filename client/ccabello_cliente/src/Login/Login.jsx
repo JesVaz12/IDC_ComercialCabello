@@ -24,7 +24,7 @@ export default function Login() {
     // Function to handle form submission
     const handleSubmit = (event) => {
         event.preventDefault(); // Prevent default form submission behavior
-        axios.post('http://localhost:8080/login', values)
+        axios.post('http://localhost:8081/login', values)
             .then(res => {
                 if (res.data.Status === 'Exito') {
                     navigate('/inventario'); // Navigate on successful login
@@ -49,7 +49,7 @@ export default function Login() {
 
     // useEffect to check for an existing session when the component mounts
     useEffect(() => {
-        axios.get("http://localhost:8080/")
+        axios.get("http://localhost:8081/")
             .then((res) => {
                 if (res.data?.Status === "Exito") {
                     setShowLogin(false);

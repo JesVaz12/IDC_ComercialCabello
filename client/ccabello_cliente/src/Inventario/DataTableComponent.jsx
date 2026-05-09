@@ -60,7 +60,7 @@ function DataTableComponent({ searchTerm }) {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const response = await axios.get('http://localhost:8080/data');
+        const response = await axios.get('http://localhost:8081/data');
         setData(response.data);
         setFilteredData(response.data);
       } catch (error) {

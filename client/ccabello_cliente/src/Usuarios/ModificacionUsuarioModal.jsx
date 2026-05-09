@@ -106,7 +106,7 @@ function ModificacionUsuarioModal({ closeModal, usuario }) {
       const username = usuario.usuario;
       delete dataToUpdate.usuario; // No se puede modificar el username
       
-      await axios.put(`http://localhost:8080/usuarios/${username}`, dataToUpdate);
+      await axios.put(`http://localhost:8081/usuarios/${username}`, dataToUpdate);
       alert('Usuario modificado correctamente');
       closeModal();
     } catch (error) {

@@ -15,7 +15,7 @@ const app = express();
 
 // --- CONFIGURACIÓN CORS ---
 app.use(cors({
-    origin: ["http://localhost:8082", "http://localhost:5173"],
+    origin: ["http://localhost:8082", "http://localhost:5173", "http://localhost:5174"],
     methods: ["POST", "GET", "PUT", "DELETE"],
     credentials: true
 }));

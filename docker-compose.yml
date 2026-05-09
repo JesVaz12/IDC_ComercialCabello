@@ -23,7 +23,7 @@ services:
     container_name: mi-app-frontend
     working_dir: /app/client/ccabello_cliente
     ports:
-      - "5173:5173"
+      - "5174:5174"
     volumes:
       - ./:/app
       - /app/client/ccabello_cliente/node_modules
@@ -33,36 +33,16 @@ services:
       - backend
     command: sh -c "npm install && npm run dev -- --host 0.0.0.0"
 
-  # 3. EL "INIT CONTAINER"
-  backend-init:
-    image: node:20
-    container_name: mi-app-backend-init
-    working_dir: /app/backend
-    volumes:
-      - ./:/app
-      - backend_node_modules:/app/backend/node_modules # <-- CAMBIO
-    networks:
-      - mi-red
-    environment:
-      DB_HOST: mi-mysql-db
-      DB_USER: ${DB_USER}
-      DB_PASSWORD: ${DB_PASSWORD}
-      DB_NAME: ${DB_NAME}
-    depends_on:
-      db:
-        condition: service_healthy
-    command: sh -c "npm install && npm run migrate"
-
-  # 4. SERVICIO DEL BACKEND (PRINCIPAL)
+  # 2. SERVICIO DEL BACKEND (PRINCIPAL)
   backend:
     image: node:20
     container_name: mi-app-backend
     working_dir: /app/backend
     ports:
-      - "8080:8080"
+      - "8081:8080"
     volumes:
       - ./:/app
-      - backend_node_modules:/app/backend/node_modules # <-- CAMBIO
+      - backend_node_modules:/app/backend/node_modules
     networks:
       - mi-red
     environment:
@@ -72,11 +52,10 @@ services:
       DB_NAME: ${DB_NAME}
       NODE_ENV: ${NODE_ENV}
       JWT_SECRET: ${JWT_SECRET}
-
     depends_on:
-      backend-init:
-        condition: service_completed_successfully
-    command: sh -c "npm run start"
+      db:
+        condition: service_healthy
+    command: sh -c "npm install && npx nodemon -L server.js"
 
 volumes:
   db_data:
