@@ -23,6 +23,7 @@ pids/
 .env
 .env.*
 !.env.example
+!.env.production.example
 
 # =========================
 # Archivos del Sistema Operativo

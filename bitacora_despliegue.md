@@ -147,3 +147,46 @@ echo "VITE_API_URL=http://localhost:8080" > client/ccabello_cliente/.env.develop
 | Justificación técnica | `nodemon` es una herramienta de desarrollo que hace watch de archivos. En producción dentro de un contenedor no existe sistema de archivos mutable, y nodemon consume recursos innecesarios. El contenedor Docker usa `npm start` como entrypoint. |
 
 ---
+
+### 2026-05-17 — Validación local end-to-end (post-Tarea 3)
+
+| Campo | Detalle |
+|-------|---------|
+| Fecha | 2026-05-17 |
+| Comando | `docker-compose up -d --build` → espera 30s → `curl /health` + `curl /login` → `docker-compose down` |
+| Resultado `/health` | HTTP 200 `{"status":"healthy","db":"ok","uptime":...}` |
+| Resultado `/login` (danone/1234) | HTTP 200 + `Set-Cookie: token=...; HttpOnly; Path=/; SameSite=Lax` |
+| Logs backend | Sin errores; `Connected to the database pool` visible |
+| Justificación técnica | Confirmación de que CORS dinámico, cookie, health check y script `node` funcionan correctamente antes de continuar con la siguiente tarea. |
+
+---
+
+### 2026-05-17 — Tarea 4: Endurecimiento de credenciales para producción
+
+#### 4.1 — JWT_SECRET robusto y plantilla de entorno
+
+| Campo | Detalle |
+|-------|---------|
+| Fecha | 2026-05-17 |
+| Archivo creado | `.env.production.example` (raíz del repo) |
+| Cambio realizado | Plantilla con todos los campos requeridos en producción; `JWT_SECRET=CHANGE_ME_...`. El valor real se genera con `openssl rand -base64 64 \| tr -d '\n'` y se establece manualmente antes del despliegue. |
+| Justificación técnica | `JWT_SECRET` ya usaba `process.env.JWT_SECRET` — no se requiere cambio en código. La plantilla documenta todas las variables necesarias para el operador del despliegue sin exponer valores reales. |
+
+#### 4.2 — Neutralización de la columna `texto_plano`
+
+| Campo | Detalle |
+|-------|---------|
+| Fecha | 2026-05-17 |
+| Archivos modificados | `backend/server.js` (2 endpoints), `db-init/init.sql` (seed de Trabajadores) |
+| Cambio en server.js | `/register_user`: posición de `texto_plano` en el array de valores cambiada de `req.body.contrasena` a `''`. `/update_user`: idem. La columna se conserva en schema para compatibilidad. |
+| Cambio en init.sql | 10 valores no vacíos de `texto_plano` en el INSERT seed reemplazados por `''`. `jcamaney` ya tenía `''`. |
+| Justificación técnica | Elimina el almacenamiento de contraseñas en texto plano. El bcrypt hash en `contrasena` es suficiente para autenticación. DROP COLUMN descartado para no romper pruebas Selenium en `main` que dependen del schema actual. |
+
+#### 4.3 — Nota sobre credenciales del seed
+
+Las credenciales del seed en `db-init/init.sql` son exclusivamente para desarrollo local. En producción:
+- El contenedor de base de datos se inicializa con este script solo en el primer despliegue (si el volumen es nuevo).
+- Los usuarios del seed deben ser eliminados o sus contraseñas cambiadas mediante la interfaz de administración antes de exponer el servicio.
+- Los hashes bcrypt del seed siguen siendo válidos para iniciar sesión en desarrollo; en producción son credenciales por defecto que deben rotarse.
+
+---

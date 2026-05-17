@@ -66,7 +66,7 @@ app.post('/register_user', (req, res) => {
             const values = [req.body.nombre.toLowerCase().replace(/(^|\s)\S/gu, c => c.toUpperCase()),
             req.body.apellido_paterno.toLowerCase().replace(/(^|\s)\S/gu, c => c.toUpperCase()),
             req.body.apellido_materno.toLowerCase().replace(/(^|\s)\S/gu, c => c.toUpperCase()),
-            req.body.usuario.toLowerCase(), hash, req.body.contrasena, req.body.rol];
+            req.body.usuario.toLowerCase(), hash, '', req.body.rol];
             db.query(sql, [values], (err, result) => {
                 if (err) return res.json({ Error: "Error al registrar el usuario" });
                 if (result.affectedRows > 0) {
@@ -86,7 +86,7 @@ app.post('/update_user', (req, res) => {
         const values = [req.body.nombre.toLowerCase().replace(/(^|\s)\S/gu, c => c.toUpperCase()),
         req.body.apellido_paterno.toLowerCase().replace(/(^|\s)\S/gu, c => c.toUpperCase()),
         req.body.apellido_materno.toLowerCase().replace(/(^|\s)\S/gu, c => c.toUpperCase()),
-            hash, req.body.contrasena, req.body.rol, req.body.usuario];
+            hash, '', req.body.rol, req.body.usuario];
         db.query(sql, values, (err, result) => {
             if (err) {
                 console.error("Database error:", err);
