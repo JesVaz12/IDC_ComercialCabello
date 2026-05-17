@@ -96,4 +96,54 @@
 - **Caso especial resuelto:** `Inventario/Faltantes.jsx` línea 147 — `location.href` convertido a template literal
 - **Verificación final:** `grep localhost:8081 src/**/*.jsx *.js` devuelve **0**
 
+#### Nota operacional — `.env.development` no versionado
+
+El `.gitignore` raíz tiene el patrón `.env.*` que bloquea todos los archivos de entorno.
+`.env.development` **no está en el repositorio**. El fallback en `src/config.js` cubre el desarrollo local sin necesitarlo.
+
+Para recrear el archivo en una clonación nueva:
+```bash
+echo "VITE_API_URL=http://localhost:8080" > client/ccabello_cliente/.env.development
+```
+
+---
+
+### 2026-05-17 — Tarea 3: Preparación del backend para Azure Container Apps
+
+#### 3.1 — CORS dinámico vía variable de entorno (H3)
+
+| Campo | Detalle |
+|-------|---------|
+| Fecha | 2026-05-17 |
+| Archivo modificado | `backend/server.js` |
+| Cambio realizado | Reemplaza array hardcodeado de origins por `process.env.CORS_ORIGINS.split(',')` con fallback a `["http://localhost:8082","http://localhost:5173","http://localhost:5174"]` |
+| Justificación técnica | En Azure, el frontend tiene un FQDN dinámico. Sin esta variable, el backend rechazaría todas las peticiones CORS de producción. El fallback garantiza que el entorno local siga funcionando sin configuración adicional. |
+
+#### 3.2 — Cookie sameSite=none en producción (H7)
+
+| Campo | Detalle |
+|-------|---------|
+| Fecha | 2026-05-17 |
+| Archivo modificado | `backend/server.js`, endpoint `/login` |
+| Cambio realizado | `sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax'` + `maxAge: 24*60*60*1000` |
+| Justificación técnica | Azure Container Apps sirve frontend y backend en dominios distintos. Los navegadores modernos bloquean cookies `sameSite: 'lax'` en contexto cross-origin. `'none'` requiere `secure: true`, que ya está condicionado a producción. Se agrega `maxAge` explícito para alinear el tiempo de vida del cookie con el del JWT (1 día). |
+
+#### 3.3 — Endpoint /health para probes de Azure (H5)
+
+| Campo | Detalle |
+|-------|---------|
+| Fecha | 2026-05-17 |
+| Archivo modificado | `backend/server.js` |
+| Cambio realizado | Agregado `GET /health` antes de `app.listen`. Ejecuta `SELECT 1` a la DB: 200 si OK, 503 si falla |
+| Justificación técnica | Azure Container Apps requiere liveness y readiness probes para gestionar el ciclo de vida del contenedor. Sin este endpoint, Azure no puede determinar si el servicio está listo para recibir tráfico ni reiniciarlo automáticamente ante fallas de DB. |
+
+#### 3.4 — Script start usa node en lugar de nodemon (H4)
+
+| Campo | Detalle |
+|-------|---------|
+| Fecha | 2026-05-17 |
+| Archivo modificado | `backend/package.json` |
+| Cambio realizado | `"start": "node server.js"` + `"dev": "nodemon server.js"` (nodemon movido a script `dev`) |
+| Justificación técnica | `nodemon` es una herramienta de desarrollo que hace watch de archivos. En producción dentro de un contenedor no existe sistema de archivos mutable, y nodemon consume recursos innecesarios. El contenedor Docker usa `npm start` como entrypoint. |
+
 ---

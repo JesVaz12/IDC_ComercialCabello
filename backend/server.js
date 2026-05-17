@@ -14,8 +14,12 @@ import { fileURLToPath } from 'url';
 const app = express();
 
 // --- CONFIGURACIÓN CORS ---
+const corsOrigins = process.env.CORS_ORIGINS
+    ? process.env.CORS_ORIGINS.split(',')
+    : ["http://localhost:8082", "http://localhost:5173", "http://localhost:5174"];
+
 app.use(cors({
-    origin: ["http://localhost:8082", "http://localhost:5173", "http://localhost:5174"],
+    origin: corsOrigins,
     methods: ["POST", "GET", "PUT", "DELETE"],
     credentials: true
 }));
@@ -131,7 +135,8 @@ app.post('/login', (req, res) => {
                     res.cookie('token', token, {
                         httpOnly: true,
                         secure: process.env.NODE_ENV === 'production',
-                        sameSite: 'lax',
+                        sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax',
+                        maxAge: 24 * 60 * 60 * 1000,
                     });
                     return res.json({ Status: "Exito" });
                 } else {
@@ -653,6 +658,16 @@ app.get('/api/productos/generar-codigo', (req, res) => {
         console.error("Error al generar código:", error);
         res.status(500).json({ error: "Error interno del servidor" });
     }
+});
+
+// --- HEALTH CHECK ---
+app.get('/health', (req, res) => {
+    db.query('SELECT 1', (err) => {
+        if (err) {
+            return res.status(503).json({ status: 'unhealthy', db: 'down' });
+        }
+        return res.status(200).json({ status: 'healthy', db: 'ok', uptime: process.uptime() });
+    });
 });
 
 // --- INICIO SERVIDOR ---
