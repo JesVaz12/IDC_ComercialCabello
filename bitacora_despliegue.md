@@ -241,3 +241,31 @@ Las credenciales del seed en `db-init/init.sql` son exclusivamente para desarrol
 Build frontend con `--build-arg VITE_API_URL=http://localhost:8080`. Vite: 236 módulos, build en 1.40s. Imágenes eliminadas post-verificación.
 
 ---
+
+### 2026-05-17 — Validación pre-Azure: stack completo con imágenes de producción
+
+| Campo | Detalle |
+|-------|---------|
+| Fecha | 2026-05-17 |
+| Archivo creado | `docker-compose.production-test.yml.example` (raíz del repo, no usado en CI) |
+| Herramienta | `docker-compose -f docker-compose.production-test.yml up -d --build` |
+
+**Resultados de validación:**
+
+| Test | Comando | Resultado |
+|------|---------|-----------|
+| Backend health | `curl http://localhost:9091/health` | `{"status":"healthy","db":"ok"}` — HTTP 200 |
+| Frontend root | `curl -I http://localhost:9090/` | HTTP 200 + `Content-Type: text/html` |
+| React Router fallback | `curl -I http://localhost:9090/login` | HTTP 200 + `text/html` (no 404) |
+| Headers de seguridad | Respuesta nginx | `X-Content-Type-Options: nosniff` presente |
+| Login danone end-to-end | `POST /login {username, password}` | HTTP 200 |
+| Cookie producción | Set-Cookie del login | `HttpOnly; Secure; SameSite=None` — correcto para cross-origin Azure |
+
+**Parámetros del test:**
+- `NODE_ENV=production` → activa `SameSite=None; Secure` en la cookie
+- `CORS_ORIGINS=http://localhost:9090` → backend acepta exactamente el origen del frontend
+- `VITE_API_URL=http://localhost:9091` → inyectado en build time vía `--build-arg`
+- MySQL en puerto 3307, backend en 9091, frontend en 9090 (sin conflicto con `docker-compose.yml`)
+- Sin bind mounts de código — comportamiento idéntico a contenedor Azure
+
+---

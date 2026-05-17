@@ -1,0 +1,61 @@
+services:
+
+  db-prodtest:
+    image: mysql:latest
+    container_name: prodtest-mysql
+    environment:
+      MYSQL_ROOT_PASSWORD: testonly_root
+      MYSQL_DATABASE: db_comercialcabello
+    volumes:
+      - ./db-init:/docker-entrypoint-initdb.d
+      - prodtest_db_data:/var/lib/mysql
+    ports:
+      - "3307:3306"
+    networks:
+      - prodtest-net
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "root", "-ptestonly_root"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  backend-prodtest:
+    build:
+      context: .
+      dockerfile: backend.Dockerfile
+    container_name: prodtest-backend
+    ports:
+      - "9091:8080"
+    networks:
+      - prodtest-net
+    environment:
+      DB_HOST: prodtest-mysql
+      DB_USER: root
+      DB_PASSWORD: testonly_root
+      DB_NAME: db_comercialcabello
+      NODE_ENV: production
+      JWT_SECRET: testonly_placeholder_jwt_not_for_real_use
+      CORS_ORIGINS: http://localhost:9090
+    depends_on:
+      db-prodtest:
+        condition: service_healthy
+
+  frontend-prodtest:
+    build:
+      context: .
+      dockerfile: client.Dockerfile
+      args:
+        VITE_API_URL: http://localhost:9091
+    container_name: prodtest-frontend
+    ports:
+      - "9090:80"
+    networks:
+      - prodtest-net
+    depends_on:
+      - backend-prodtest
+
+volumes:
+  prodtest_db_data:
+
+networks:
+  prodtest-net:
