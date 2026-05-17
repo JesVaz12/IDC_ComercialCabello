@@ -2,6 +2,7 @@ import  { useState, useEffect } from 'react';
 import DataTable from 'react-data-table-component';
 import axios from 'axios';
 import ModificacionProductosModal from './ModificacionProductosModal';
+import { API_URL } from '@/config';
 
 function DataTableComponentFaltantes() {
   const [data, setData] = useState([]);
@@ -22,7 +23,7 @@ function DataTableComponentFaltantes() {
   useEffect(() => {
     async function fetchData() {
       try {
-        const response = await axios.get('http://localhost:8081/dataFaltantes');
+        const response = await axios.get(`${API_URL}/dataFaltantes`);
         const processedData = response.data.map((item) => ({
           ...item,
           cantidad: parseInt(item.cantidad, 10), 

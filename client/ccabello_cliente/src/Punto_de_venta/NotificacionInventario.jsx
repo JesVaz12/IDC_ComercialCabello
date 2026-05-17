@@ -4,6 +4,7 @@ import axios from 'axios'
 import { useEffect, useState } from 'react'
 import toast, { Toaster } from 'react-hot-toast';
 import TablaFaltantes from './TablaFaltantes.jsx';
+import { API_URL } from '@/config';
 
 // eslint-disable-next-line no-unused-vars
 function NotificacionInventario({ closeModal, faltantes}) {
@@ -12,7 +13,7 @@ function NotificacionInventario({ closeModal, faltantes}) {
 
     const handleDelete = async (codigo) => {
             try {
-                axios.delete(`http://localhost:8081/deleteProducto/${codigo}`).then(res => {
+                axios.delete(`${API_URL}/deleteProducto/${codigo}`).then(res => {
                     if (res.status === 200) {
                         localStorage.setItem('showToast', 'Producto eliminado con éxito');
                         window.location.reload();
@@ -31,7 +32,7 @@ function NotificacionInventario({ closeModal, faltantes}) {
     /*
     useEffect(() => {
         if (true) {
-            axios.get(`http://localhost:8081/getProducto/${codigo}`)
+            axios.get(`${API_URL}/getProducto/${codigo}`)
                 .then(res => {  
                     if (res.data.Status === 'Exito') {
                         setValue({

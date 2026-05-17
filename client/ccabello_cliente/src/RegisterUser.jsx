@@ -1,6 +1,7 @@
 import { Link } from 'react-router-dom';
 import { useState } from 'react';
 import axios from 'axios';
+import { API_URL } from '@/config';
 
 function RegisterUser(){
     const [values, setValues] = useState({
@@ -13,7 +14,7 @@ function RegisterUser(){
     })
     const handleSubmit = (event) => {
         event.preventDefault();
-        axios.post('http://localhost:8081/register_user', values)
+        axios.post(`${API_URL}/register_user`, values)
         .then(res => console.log(res))
         .then(err => console.log(err));
     }

@@ -2,6 +2,7 @@ import './Modal.css'
 import PropTypes from 'prop-types';
 import axios from 'axios'
 import { useState } from 'react'
+import { API_URL } from '@/config';
 
 function AltaUsuariosModal({ closeModal }) {
     const [values, setValues] = useState({
@@ -32,7 +33,7 @@ function AltaUsuariosModal({ closeModal }) {
                 document.getElementById("passerror").removeAttribute("open");
               }
             console.log(values);
-            axios.post('http://localhost:8081/register_user', values)
+            axios.post(`${API_URL}/register_user`, values)
                 .then(res => {
                     console.log(res.status)
                     if (res.status === 200) {

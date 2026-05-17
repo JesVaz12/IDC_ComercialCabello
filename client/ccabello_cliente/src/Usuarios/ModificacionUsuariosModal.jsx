@@ -3,6 +3,7 @@ import PropTypes from 'prop-types';
 import axios from 'axios'
 import { useState, useEffect } from 'react'
 import toast, { Toaster } from 'react-hot-toast';
+import { API_URL } from '@/config';
 
 function ModificacionUsuariosModal({ closeModal, usuario }) {
     const [values, setValues] = useState({
@@ -17,7 +18,7 @@ function ModificacionUsuariosModal({ closeModal, usuario }) {
 
     useEffect(() => {
         if (usuario) {
-            axios.get(`http://localhost:8081/GetUserData/${usuario}`)
+            axios.get(`${API_URL}/GetUserData/${usuario}`)
                 .then(res => {  
                     setValues({
                         usuario: res.data.usuario,
@@ -58,7 +59,7 @@ function ModificacionUsuariosModal({ closeModal, usuario }) {
                 document.getElementById("passerror").removeAttribute("open");
               }
             console.log(values);
-            axios.post('http://localhost:8081/update_user', values)
+            axios.post(`${API_URL}/update_user`, values)
                 .then(res => {
                     if (res.status === 200) {
                         localStorage.setItem('showToast', 'Usuario modificado con éxito');

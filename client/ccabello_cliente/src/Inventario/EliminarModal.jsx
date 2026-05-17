@@ -4,6 +4,7 @@ import axios from 'axios'
 import { useEffect, useState } from 'react'
 import toast, { Toaster } from 'react-hot-toast';
 import ConfirmacionModal from './ConfirmacionModal';
+import { API_URL } from '@/config';
 
 
 function EliminarModal({ closeModal, codigo}) {
@@ -19,7 +20,7 @@ function EliminarModal({ closeModal, codigo}) {
     const handleDelete = async (codigo) => {
         if(values.cantidad <= 0){
             try {
-                axios.delete(`http://localhost:8081/deleteProducto/${codigo}`).then(res => {
+                axios.delete(`${API_URL}/deleteProducto/${codigo}`).then(res => {
                     if (res.status == 200) {
                         localStorage.setItem('showToast', 'Producto eliminado con éxito');
                         window.location.replace('/inventario');
@@ -37,7 +38,7 @@ function EliminarModal({ closeModal, codigo}) {
 
     useEffect(() => {
         if (codigo) {
-            axios.get(`http://localhost:8081/getProducto/${codigo}`)
+            axios.get(`${API_URL}/getProducto/${codigo}`)
                 .then(res => {  
                     if (res.data.Status === 'Exito') {
                         setValues({

@@ -1,5 +1,6 @@
 import axios from 'axios';
 import PropTypes from 'prop-types';
+import { API_URL } from '@/config';
 
 const modalStyles = {
   overlay: {
@@ -80,7 +81,7 @@ function EliminarUsuarioModal({ closeModal, usuario }) {
 
   const handleConfirmDelete = async () => {
     try {
-      await axios.delete(`http://localhost:8081/deleteUsuario/${usuario.usuario}`, {
+      await axios.delete(`${API_URL}/deleteUsuario/${usuario.usuario}`, {
         withCredentials: true 
       });
       alert('Usuario eliminado correctamente');

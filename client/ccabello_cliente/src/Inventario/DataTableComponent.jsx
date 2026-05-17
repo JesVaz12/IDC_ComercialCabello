@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import DataTable from 'react-data-table-component';
 import axios from 'axios';
 import PropTypes from 'prop-types';
+import { API_URL } from '@/config';
 import modIcon from '../assets/inventario/modIcon.svg';
 // --- CORRECCIÓN: Se añaden extensiones .jsx para ayudar al build ---
 import ModificacionProductosModal from './ModificacionProductosModal.jsx';
@@ -60,7 +61,7 @@ function DataTableComponent({ searchTerm }) {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const response = await axios.get('http://localhost:8081/data');
+        const response = await axios.get(`${API_URL}/data`);
         setData(response.data);
         setFilteredData(response.data);
       } catch (error) {

@@ -1,5 +1,6 @@
 import { Component, createRef } from 'react';
 import axios from 'axios';
+import { API_URL } from '@/config';
 import tienda_bg from '../assets/inventario/tienda_bg.svg';
 import '../Inventario/Inventario.css';
 import tienda from '../assets/inventario/tienda.svg';
@@ -56,7 +57,7 @@ class Pventa extends Component {
   async verifyUser() {
     try {
       axios.defaults.withCredentials = true;
-      const res = await axios.get('http://localhost:8081/');
+      const res = await axios.get(`${API_URL}/`);
 
       // --> LÍNEA AÑADIDA PARA DEPURACIÓN <--
       console.log('Datos recibidos del servidor:', res.data);

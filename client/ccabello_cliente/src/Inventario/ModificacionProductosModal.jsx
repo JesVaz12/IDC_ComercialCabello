@@ -3,11 +3,12 @@ import PropTypes from 'prop-types';
 import axios from 'axios'
 import { useEffect, useState } from 'react'
 import toast, { Toaster } from 'react-hot-toast';
+import { API_URL } from '@/config';
 
 function ModificacionProductosModal({ closeModal, codigo}) {
     useEffect(() => {
         if (codigo) {
-            axios.get(`http://localhost:8081/getProducto/${codigo}`)
+            axios.get(`${API_URL}/getProducto/${codigo}`)
                 .then(res => {  
                     if (res.data.Status === 'Exito') {
                         setValues({
@@ -42,7 +43,7 @@ function ModificacionProductosModal({ closeModal, codigo}) {
     const handleSubmit = (event) => {
         event.preventDefault();
         console.log(values);
-        axios.post('http://localhost:8081/modificarProducto', values)
+        axios.post(`${API_URL}/modificarProducto`, values)
             .then(res => {
                 if (res.data.Status === 'Exito') {
                     localStorage.setItem('showToast', 'Producto modificado con éxito');

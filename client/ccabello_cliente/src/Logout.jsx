@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
 import axios from 'axios';
+import { API_URL } from '@/config';
 
 
 
@@ -7,7 +8,7 @@ function Logout(){
     const [auth, setAuth] = useState(false);
     axios.defaults.withCredentials = true;
     useEffect(() => {
-        axios.get('http://localhost:8081/')
+        axios.get(`${API_URL}/`)
         .then(res => {
             console.log(res.data); 
             if(res.data.Status === "Exito"){
@@ -21,7 +22,7 @@ function Logout(){
     }, [])
 
     const handleDelete = () => {
-        axios.get('http://localhost:8081/logout')
+        axios.get(`${API_URL}/logout`)
         // eslint-disable-next-line no-unused-vars
         .then(res => {
             location.reload(true);

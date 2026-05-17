@@ -3,6 +3,7 @@ import PropTypes from 'prop-types';
 import axios from 'axios'
 import { useState } from 'react'
 import toast, { Toaster } from 'react-hot-toast';
+import { API_URL } from '@/config';
 
 function AltaProductosModal({ closeModal }) {
     const [values, setValues] = useState({
@@ -17,7 +18,7 @@ function AltaProductosModal({ closeModal }) {
         event.preventDefault();
         console.log(values);
         
-        axios.post('http://localhost:8081/insertarProducto', values)
+        axios.post(`${API_URL}/insertarProducto`, values)
             .then(res => {
                 if (res.data.Status === 'Exito') {
                     window.location.reload();
@@ -85,7 +86,7 @@ function AltaProductosModal({ closeModal }) {
 
     const handleGenerateCode = async () => {
         try {
-            const res = await axios.get('http://localhost:8081/api/productos/generar-codigo');
+            const res = await axios.get(`${API_URL}/api/productos/generar-codigo`);
             if (res.data.codigo) {
                 setValues(prev => ({ ...prev, codigo: res.data.codigo }));
                 toast.success('¡Código único generado!');

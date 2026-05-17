@@ -1,6 +1,7 @@
 import  { useState, useEffect } from 'react';
 import DataTable from 'react-data-table-component';
 import axios from 'axios';
+import { API_URL } from '@/config';
 import delIcon from '../assets/inventario/-.svg'
 import PropTypes from 'prop-types';
 import CobrarModal from './CobrarModal';
@@ -35,7 +36,7 @@ function DataTableComponent({searchTerm}) {
 
 /*  const handleDelete = async (codigo) => {
     try {
-      axios.delete(`http://localhost:8081/deleteProducto/${codigo}`);
+      axios.delete(`${API_URL}/deleteProducto/${codigo}`);
       setData(data.filter((row) => row.codigo !== codigo));
     } catch (error) {
       console.error('Error deleting data:', error);
@@ -83,7 +84,7 @@ function DataTableComponent({searchTerm}) {
   useEffect(() => {
     async function fetchDataProduct() {
         if (searchTerm) {
-            const response = await axios.get(`http://localhost:8081/GetProducto/${searchTerm.value}`);
+            const response = await axios.get(`${API_URL}/GetProducto/${searchTerm.value}`);
             const data_response = Array.isArray(response.data) ? response.data : [response.data];
             const processedData = data_response.map((item) => ({
                 nombre: item.Producto.nombre,

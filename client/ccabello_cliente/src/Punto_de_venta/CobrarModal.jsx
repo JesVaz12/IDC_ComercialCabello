@@ -4,6 +4,7 @@ import axios from 'axios'
 import { useEffect, useState } from 'react'
 import toast, { Toaster } from 'react-hot-toast';
 import NotificacionInventario from './NotificacionInventario';
+import { API_URL } from '@/config';
 
 
 function CobrarModal({ closeModal, data}) {
@@ -42,18 +43,18 @@ function CobrarModal({ closeModal, data}) {
       // Triggered after successful API call
       const realizarCobro = () => {
           let username = '';
-          axios.get('http://localhost:8081/GetUser', { withCredentials: true })
+          axios.get(`${API_URL}/GetUser`, { withCredentials: true })
               .then(response => {
                   username = response.data.username;
               }).then(() => {
                   if (pago >= costo) {
-                      axios.post('http://localhost:8081/realizarCobro', { pago, costo, data, username })
+                      axios.post(`${API_URL}/realizarCobro`, { pago, costo, data, username })
                           .then(res => {
                               if (res.data.Status === 'Exito') {
                                   const faltantes = res.data.Faltantes;
                                   const payload = { pago, costo, data };
                                   localStorage.setItem('showToast', 'Venta exitosa');
-                                axios.post('http://localhost:8081/imprimir-ticket', payload, {
+                                axios.post(`${API_URL}/imprimir-ticket`, payload, {
                                 responseType: 'blob' 
                                 }).then((response) => {
                                 const url = window.URL.createObjectURL(new Blob([response.data], { type: 'application/pdf' }));

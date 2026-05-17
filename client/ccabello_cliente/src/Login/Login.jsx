@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
+import { API_URL } from '@/config';
 
 // Assuming your assets are in the correct path
 import ellipse from '../assets/login/ellipse.svg';
@@ -24,7 +25,7 @@ export default function Login() {
     // Function to handle form submission
     const handleSubmit = (event) => {
         event.preventDefault(); // Prevent default form submission behavior
-        axios.post('http://localhost:8081/login', values)
+        axios.post(`${API_URL}/login`, values)
             .then(res => {
                 if (res.data.Status === 'Exito') {
                     navigate('/inventario'); // Navigate on successful login
@@ -49,7 +50,7 @@ export default function Login() {
 
     // useEffect to check for an existing session when the component mounts
     useEffect(() => {
-        axios.get("http://localhost:8081/")
+        axios.get(`${API_URL}/`)
             .then((res) => {
                 if (res.data?.Status === "Exito") {
                     setShowLogin(false);

@@ -13,6 +13,7 @@ import tienda_bg from '../assets/inventario/tienda_bg.svg';
 import DataTableComponent from './DataTableComponent';
 import GetUser from '../GetUser';
 import axios from 'axios';
+import { API_URL } from '@/config';
 import Logout from '../Logout'
 import AltaUsuarios from './AltaUsuarios';
 import PropTypes from 'prop-types';
@@ -48,7 +49,7 @@ class Admin_usuarios extends Component {
   async verifyUser() {
     try {
       axios.defaults.withCredentials = true;
-      const res = await axios.get('http://localhost:8081/');
+      const res = await axios.get(`${API_URL}/`);
       if (res.data.Status !== 'Exito') {
         window.location.replace('/');
         console.log(" notverified");

@@ -2,6 +2,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import PropTypes from 'prop-types';
 import Select from 'react-select';
 import axios from 'axios';
+import { API_URL } from '@/config';
 
 const Checkbox = ({ children, ...props }) => (
   <label style={{ marginRight: '1em' }}>
@@ -46,7 +47,7 @@ function AddProduct({ onProductSelect }) {
     async function fetchAllRecords() {
       setIsLoading(true);
       try {
-        const response = await axios.get('http://localhost:8081/dataPventa');
+        const response = await axios.get(`${API_URL}/dataPventa`);
 
         const formattedOptions = response.data.map(item => ({
           value: item.codigo,

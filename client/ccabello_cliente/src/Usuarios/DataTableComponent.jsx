@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import DataTable from 'react-data-table-component';
 import axios from 'axios';
 import PropTypes from 'prop-types';
+import { API_URL } from '@/config';
 import modIcon from '../assets/inventario/modIcon.svg';
 
 import ModificacionUsuariosModal from './ModificacionUsuariosModal.jsx';
@@ -45,7 +46,7 @@ function DataTableComponent({ searchTerm }) {
         // --- INICIO DE LA CORRECCIÓN (Error 403) ---
         // ---
         // Añadimos 'withCredentials: true' para que axios envíe la cookie de login
-        const response = await axios.get('http://localhost:8081/data_usuarios', { 
+        const response = await axios.get(`${API_URL}/data_usuarios`, {
           withCredentials: true 
         }); 
         // ---

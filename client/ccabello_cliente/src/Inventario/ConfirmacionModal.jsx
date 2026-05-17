@@ -3,6 +3,7 @@ import PropTypes from 'prop-types';
 import axios from 'axios'
 import { useEffect, useState } from 'react'
 import toast, { Toaster } from 'react-hot-toast';
+import { API_URL } from '@/config';
 
 // eslint-disable-next-line no-unused-vars
 function ConfirmacionModal({ closeModal, codigo }) {
@@ -12,7 +13,7 @@ function ConfirmacionModal({ closeModal, codigo }) {
 
     const handleDelete = async (codigo) => {
         try {
-            axios.delete(`http://localhost:8081/deleteProducto/${codigo}`).then(res => {
+            axios.delete(`${API_URL}/deleteProducto/${codigo}`).then(res => {
                 // Evaluamos si el backend realmente confirmó la eliminación
                 if (res.data.Status === 'Exito') {
                     localStorage.setItem('showToast', 'Producto eliminado con éxito');
@@ -33,7 +34,7 @@ function ConfirmacionModal({ closeModal, codigo }) {
 
     useEffect(() => {
         if (codigo) {
-            axios.get(`http://localhost:8081/getProducto/${codigo}`)
+            axios.get(`${API_URL}/getProducto/${codigo}`)
                 .then(res => {
                     if (res.data.Status === 'Exito') {
                         setValue({
