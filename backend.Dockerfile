@@ -1,12 +1,12 @@
-# Usamos la imagen de Node 20
-FROM node:20
-WORKDIR /app
-# Copiamos los package.json del backend
+FROM node:20-alpine
+WORKDIR /app/backend
+
+# Instalar dependencias (layer cacheado si package*.json no cambia)
 COPY backend/package*.json ./
-RUN npm install
-# Copiamos el código fuente del backend
+RUN npm ci --omit=dev
+
+# Copiar código fuente y assets de pdfmake después de instalar deps
 COPY backend/ ./
-# Exponemos el puerto del backend
+
 EXPOSE 8080
-# El comando para iniciar en producción
 CMD ["node", "server.js"]

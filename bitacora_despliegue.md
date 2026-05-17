@@ -190,3 +190,54 @@ Las credenciales del seed en `db-init/init.sql` son exclusivamente para desarrol
 - Los hashes bcrypt del seed siguen siendo válidos para iniciar sesión en desarrollo; en producción son credenciales por defecto que deben rotarse.
 
 ---
+
+### 2026-05-17 — Tarea 5: Dockerfiles de Producción para Azure Container Apps
+
+#### 5.1 — backend.Dockerfile
+
+| Campo | Detalle |
+|-------|---------|
+| Fecha | 2026-05-17 |
+| Archivo modificado | `backend.Dockerfile` (raíz del repo — reescrito) |
+| Cambio realizado | `node:20-alpine`; WORKDIR `/app/backend`; `npm ci --omit=dev`; patrón de cache (package*.json → install → COPY código). Fonts e img incluidos vía `COPY backend/ ./`. |
+| Tamaño imagen | **180.9 MB** (< 200 MB) |
+| Justificación técnica | Alpine elimina ~300 MB respecto a `node:20` full. `--omit=dev` excluye nodemon y otras devDependencies. El orden COPY garantiza que cambios de código no invaliden la capa de `npm ci`. |
+
+#### 5.2 — client.Dockerfile
+
+| Campo | Detalle |
+|-------|---------|
+| Fecha | 2026-05-17 |
+| Archivo modificado | `client.Dockerfile` (raíz del repo — reescrito) |
+| Cambio realizado | Multi-stage: Stage 1 `node:20-alpine` con `ARG VITE_API_URL` / `ENV VITE_API_URL=$VITE_API_URL` antes de `npm run build`; Stage 2 `nginx:alpine` sirve `/app/dist` + copia `nginx.conf`. |
+| Tamaño imagen | **25.0 MB** |
+| Justificación técnica | Multi-stage descarta Node.js y node_modules del artefacto final. ARG permite inyectar el FQDN del backend Azure en build time sin hardcodear. |
+
+#### 5.3 — nginx.conf
+
+| Campo | Detalle |
+|-------|---------|
+| Fecha | 2026-05-17 |
+| Archivo creado | `nginx.conf` (raíz del repo) |
+| Cambio realizado | `try_files $uri $uri/ /index.html` para React Router; headers `X-Frame-Options: SAMEORIGIN` y `X-Content-Type-Options: nosniff`. |
+| Justificación técnica | Sin el fallback a `index.html`, cualquier ruta directa (F5 / deep link) devuelve 404. Los headers mitigan clickjacking y MIME-sniffing. |
+
+#### 5.4 — .dockerignore
+
+| Campo | Detalle |
+|-------|---------|
+| Fecha | 2026-05-17 |
+| Archivo creado | `.dockerignore` (raíz del repo) |
+| Cambio realizado | Excluye `node_modules`, `**/node_modules`, `.git`, `.env*`, `dist`, `**/dist`, `*.log`, `.DS_Store`, `coverage/`, `.claude-flow/`. Excepción: `.env.production.example`. |
+| Justificación técnica | Sin este archivo Docker incluiría todos los `node_modules` locales en el contexto de build, aumentando el tiempo de transferencia. |
+
+#### 5.5 — Verificación local
+
+| Imagen | Tamaño | Resultado |
+|--------|--------|-----------|
+| `test-backend` | 180.9 MB | Build exitoso con `node:20-alpine` + `npm ci --omit=dev` |
+| `test-frontend` | 25.0 MB | `curl -I http://localhost:9999/` → **HTTP 200** `text/html` |
+
+Build frontend con `--build-arg VITE_API_URL=http://localhost:8080`. Vite: 236 módulos, build en 1.40s. Imágenes eliminadas post-verificación.
+
+---
