@@ -37,3 +37,10 @@ Thumbs.db
 # =========================
 .eslintcache
 .node_repl_history
+
+# =========================
+# Artefactos de herramientas de IA / agentes (no forman parte del proyecto)
+# =========================
+.claude-flow/
+**/.claude-flow/
+.claude/
